@@ -64,10 +64,19 @@ namespace Pokemon
         public int Health
         {
             get { return _health; }
+            set { _health = value; }
         }
         public int Speed
         {
             get { return _speed; }
+        }
+        public int Defense
+        {
+            get { return _defense; }
+        }
+        public int SDefense
+        {
+            get { return _sDefense; }
         }
         public string Move1
         {

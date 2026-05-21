@@ -12,12 +12,13 @@ namespace Final_Assignment
         private SpriteBatch _spriteBatch;
         KeyboardState currentState, oldState;
         SpriteFont menuFont, healthFont;
-        Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, enemyLocation, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox;
+        Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox;
         Snorlax snorlax;
         Arcanine arcanine;
         Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl;
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText;
         int healthAmount, totalHealth, charSpeed, enemySpeed;
+        float charHealth, enemyHealth;
         enum Pokemon
         {
             Snorlax, Ninetails, Arcanine, Flygon, Sceptile, Electivire
@@ -67,11 +68,21 @@ namespace Final_Assignment
             enemyHealthImg = new Rectangle(70, 50, 370, 100);
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
             enemyNameText = new Vector2(100, 40);
-            snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
             arcanine = new Arcanine(AWtexture, AOtexture, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
+            snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400), arcanine);
 
-            healthAmount = snorlax.Health;
-            totalHealth = snorlax.Health;
+            if (currentPokemon == Pokemon.Snorlax)
+            {
+                healthAmount = snorlax.Health;
+                totalHealth = snorlax.Health;
+                charHealth = 235f / snorlax.Health;
+                charSpeed = snorlax.Speed;
+            }
+            if (currentEnemy == Enemy.Arcanine)
+            {
+                enemyHealth = 235f / arcanine.Health;
+                enemySpeed = arcanine.Speed;
+            }
 
             currentPokemon = Pokemon.Snorlax;
             currentEnemy = Enemy.Arcanine;
@@ -127,6 +138,7 @@ namespace Final_Assignment
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
                         snorlax.Move1PP -= 1;
+                        enemyHealthBar.Width -= (int)(snorlax.Move1Damage * enemyHealth);
                         snorlax.CurrentMove = Snorlax.Move.headbutt;
                     }
                 }
