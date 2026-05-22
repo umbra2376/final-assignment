@@ -22,6 +22,7 @@ namespace Pokemon
         private string _move1, _move2, _move3, _move4, _name;
         private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
         private float _battle_time, _frame_time, _alpha;
+        private int _healtCurrent;
         public enum Move
         {
             defenseCurl, bodyPress, hyperBeam, headbutt, none
@@ -45,6 +46,7 @@ namespace Pokemon
             Random stats = new Random();
             _speed = stats.Next(80, 111);
             _health = stats.Next(80, 101);
+            _healtCurrent = _health;
             _defense = stats.Next(70, 91);
             _attack = stats.Next(100, 121);
             _sAttack = stats.Next(90, 111);
@@ -66,6 +68,13 @@ namespace Pokemon
             get { return _health; }
             set { _health = value; }
         }
+
+        public int HealthCurrent
+        {
+            get { return _healtCurrent; }
+            set { _healtCurrent = value; }
+        }
+
         public int Speed
         {
             get { return _speed; }

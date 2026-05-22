@@ -138,8 +138,9 @@ namespace Final_Assignment
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
                         snorlax.Move1PP -= 1;
-                        enemyHealthBar.Width -= (int)(snorlax.Move1Damage * enemyHealth);
                         snorlax.CurrentMove = Snorlax.Move.headbutt;
+                        if (currentEnemy == Enemy.Arcanine)
+                            arcanine.HealthCurrent -= (int)(snorlax.Move1Damage);
                     }
                 }
                 if (arrowSize.X == 20 && arrowSize.Y == 680 && snorlax.CanAct)
@@ -148,6 +149,8 @@ namespace Final_Assignment
                     {
                         snorlax.Move2PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.bodyPress;
+                        if (currentEnemy == Enemy.Arcanine)
+                            arcanine.HealthCurrent -= (int)(snorlax.Move2Damage);
                     }
                 }
                 if (arrowSize.X == 290 && arrowSize.Y == 600 && snorlax.CanAct)
@@ -156,6 +159,8 @@ namespace Final_Assignment
                     {
                         snorlax.Move3PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.hyperBeam;
+                        if (currentEnemy == Enemy.Arcanine)
+                            arcanine.HealthCurrent -= (int)(snorlax.Move3Damage);
                     }
                 }
                 if (arrowSize.X == 290 && arrowSize.Y == 680 && snorlax.CanAct)
@@ -167,7 +172,14 @@ namespace Final_Assignment
                     }
                 }
             }
+            
             snorlax.Update(gameTime);
+            if (snorlax.CanAct)
+            {
+
+                enemyHealthBar.Width = (int)(235 * (float)arcanine.HealthCurrent / arcanine.Health);
+            }
+            arcanine.Update(gameTime);
             oldState = currentState;
             base.Update(gameTime);
         }
