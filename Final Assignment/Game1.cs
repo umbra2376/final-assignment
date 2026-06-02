@@ -15,7 +15,7 @@ namespace Final_Assignment
         Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox;
         Snorlax snorlax;
         Arcanine arcanine;
-        Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl;
+        Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact;
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText;
         int healthAmount, totalHealth, charSpeed, enemySpeed;
         float charHealth, enemyHealth;
@@ -68,7 +68,7 @@ namespace Final_Assignment
             enemyHealthImg = new Rectangle(70, 50, 370, 100);
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
             enemyNameText = new Vector2(100, 40);
-            arcanine = new Arcanine(AWtexture, AOtexture, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
+            arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
             snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400), arcanine);
 
             if (currentPokemon == Pokemon.Snorlax)
@@ -105,6 +105,8 @@ namespace Final_Assignment
             hyperBeam = Content.Load<Texture2D>("hyperBeam");
             hyperBeamImpact = Content.Load<Texture2D>("hyperBeamImpact");
             defenseCurl = Content.Load<Texture2D>("defenseCurl");
+            blastTexture = Content.Load<Texture2D>("blastBeam");
+            blastImpact = Content.Load<Texture2D>("blastImpact");
             // TODO: use this.Content to load your game content here
         }
 
@@ -139,6 +141,7 @@ namespace Final_Assignment
                     {
                         snorlax.Move1PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.headbutt;
+                        arcanine.CurrentMove = Arcanine.Move.fireblast;
                         if (currentEnemy == Enemy.Arcanine)
                             arcanine.HealthCurrent -= (int)(snorlax.Move1Damage);
                     }

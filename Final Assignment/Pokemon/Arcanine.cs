@@ -16,22 +16,24 @@ namespace Pokemon
 {
     class Arcanine
     {
-        private Texture2D _Wtexture, _Otexture;
-        private Rectangle _Olocation, _Wlocation;
+        private Texture2D _Wtexture, _Otexture, _blastTexture, _blastImpact;
+        private Rectangle _Olocation, _Wlocation, _blastLocation;
         private bool _wild;
         private string _move1, _move2, _move3, _move4, _name;
         private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
-        private float _battle_time, _frame_time, _alpha;
+        private float _battle_time, _frame_time;
         private int _healtCurrent;
         public enum Move
         {
-            defenseCurl, bodyPress, hyperBeam, headbutt, none
+            flamethrower, crunch, fireblast, howl, none
         }
         private Move _currentMove;
-        public Arcanine(Texture2D Wtexture, Texture2D Otexture, Rectangle Olocation, Rectangle Wlocation)
+        public Arcanine(Texture2D Wtexture, Texture2D Otexture, Texture2D BlastTexture, Texture2D BlastImpact, Rectangle Olocation, Rectangle Wlocation)
         {
             _Wtexture = Wtexture;
             _Otexture = Otexture;
+            _blastTexture = BlastTexture;
+            _blastImpact = BlastImpact;
             _Wlocation = Wlocation;
             _Olocation = Olocation;
             _move1 = "Flamethrower";
@@ -43,6 +45,10 @@ namespace Pokemon
             _move2_PP = 15;
             _move3_PP = 5;
             _move4_PP = 40;
+            if (_wild)
+            {
+                _blastLocation = new Rectangle(610, 90, 300, 200);
+            }
             Random stats = new Random();
             _speed = stats.Next(80, 111);
             _health = stats.Next(80, 101);
@@ -132,6 +138,7 @@ namespace Pokemon
             if (_wild)
             {
                 spriteBatch.Draw(_Wtexture, _Wlocation, Color.White);
+                spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
             }
             else
             {
