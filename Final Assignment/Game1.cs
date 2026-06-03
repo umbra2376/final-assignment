@@ -17,8 +17,9 @@ namespace Final_Assignment
         Arcanine arcanine;
         Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact;
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText;
-        int healthAmount, totalHealth, charSpeed, enemySpeed;
+        int healthAmount, totalHealth, charSpeed, enemySpeed, enemyChoice, crit, Snoremove1Damage, Snoremove2Damage, Snoremove3Damage;
         float charHealth, enemyHealth;
+        Random enemyMove = new Random();
         enum Pokemon
         {
             Snorlax, Ninetails, Arcanine, Flygon, Sceptile, Electivire
@@ -27,8 +28,13 @@ namespace Final_Assignment
         {
             Arcanine, Ninetails, Flygon, Sceptile, Electivire
         }
+        enum Turn
+        {
+            charTurn, enemyTurn
+        }
         private Pokemon currentPokemon;
         private Enemy currentEnemy;
+        private Turn currentTurn;
 
         public Game1()
         {
@@ -69,8 +75,9 @@ namespace Final_Assignment
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
             enemyNameText = new Vector2(100, 40);
             arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
-            snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400), arcanine);
-
+            snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
+            currentPokemon = Pokemon.Snorlax;
+            currentEnemy = Enemy.Arcanine;
             if (currentPokemon == Pokemon.Snorlax)
             {
                 healthAmount = snorlax.Health;
@@ -82,10 +89,21 @@ namespace Final_Assignment
             {
                 enemyHealth = 235f / arcanine.Health;
                 enemySpeed = arcanine.Speed;
+                if (currentPokemon == Pokemon.Snorlax && currentEnemy == Enemy.Arcanine)
+                {
+                    Snoremove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 70 + 2) / 50);
+                    Snoremove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 80 + 2) / 50);
+                    Snoremove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 150 + 2) / 50);
+                }
             }
-
-            currentPokemon = Pokemon.Snorlax;
-            currentEnemy = Enemy.Arcanine;
+            if (charSpeed >= enemySpeed)
+            {
+                currentTurn = Turn.charTurn;
+            }
+            else
+            {
+                currentTurn = Turn.enemyTurn;
+            }
         }
 
         protected override void LoadContent()
@@ -117,56 +135,55 @@ namespace Final_Assignment
 
             // TODO: Add your update logic here
             currentState = Keyboard.GetState();
-            if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
-                arrowSize.Y = 680;
-            else if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Right))
-                arrowSize.X = 290;
-            else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
-                arrowSize.Y = 600;
-            else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Right))
-                arrowSize.X = 290;
-            else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
-                arrowSize.Y = 680;
-            else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Left))
-                arrowSize.X = 20;
-            else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
-                arrowSize.Y = 600;
-            else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Left))
-                arrowSize.X = 20;
-            if (currentPokemon == Pokemon.Snorlax)
+            if (currentTurn == Turn.charTurn && currentPokemon == Pokemon.Snorlax && snorlax.CanAct)
             {
+                if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
+                    arrowSize.Y = 680;
+                else if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Right))
+                    arrowSize.X = 290;
+                else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
+                    arrowSize.Y = 600;
+                else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Right))
+                    arrowSize.X = 290;
+                else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
+                    arrowSize.Y = 680;
+                else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Left))
+                    arrowSize.X = 20;
+                else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
+                    arrowSize.Y = 600;
+                else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Left))
+                    arrowSize.X = 20;
                 if (arrowSize.X == 20 && arrowSize.Y == 600 && snorlax.CanAct)
                 {
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
                         snorlax.Move1PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.headbutt;
-                        arcanine.CurrentMove = Arcanine.Move.fireblast;
                         if (currentEnemy == Enemy.Arcanine)
-                            arcanine.HealthCurrent -= (int)(snorlax.Move1Damage);
+                            arcanine.HealthCurrent -= (int)(Snoremove1Damage);
                     }
                 }
-                if (arrowSize.X == 20 && arrowSize.Y == 680 && snorlax.CanAct)
+                else if (arrowSize.X == 20 && arrowSize.Y == 680 && snorlax.CanAct)
                 {
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
                         snorlax.Move2PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.bodyPress;
                         if (currentEnemy == Enemy.Arcanine)
-                            arcanine.HealthCurrent -= (int)(snorlax.Move2Damage);
+                            arcanine.HealthCurrent -= (int)(Snoremove2Damage);
                     }
                 }
-                if (arrowSize.X == 290 && arrowSize.Y == 600 && snorlax.CanAct)
+                else if (arrowSize.X == 290 && arrowSize.Y == 600 && snorlax.CanAct)
                 {
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
                         snorlax.Move3PP -= 1;
                         snorlax.CurrentMove = Snorlax.Move.hyperBeam;
                         if (currentEnemy == Enemy.Arcanine)
-                            arcanine.HealthCurrent -= (int)(snorlax.Move3Damage);
+                            arcanine.HealthCurrent -= (int)(Snoremove3Damage);
                     }
                 }
-                if (arrowSize.X == 290 && arrowSize.Y == 680 && snorlax.CanAct)
+                else if (arrowSize.X == 290 && arrowSize.Y == 680 && snorlax.CanAct)
                 {
                     if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
                     {
@@ -174,12 +191,30 @@ namespace Final_Assignment
                         snorlax.CurrentMove = Snorlax.Move.defenseCurl;
                     }
                 }
-            }
-            
-            snorlax.Update(gameTime);
-            if (snorlax.CanAct)
+        }
+            /*if (currentTurn == Turn.enemyTurn && currentEnemy == Enemy.Arcanine && arcanine.CanAct)
             {
-
+                enemyChoice = enemyMove.Next(1, 5);
+                if (enemyChoice == 1)
+                {
+                    arcanine.CurrentMove = Arcanine.Move.fireblast;
+                }
+                else if (enemyChoice == 2)
+                {
+                    arcanine.CurrentMove = Arcanine.Move.crunch;
+                }
+                else if (enemyChoice == 3)
+                {
+                    arcanine.CurrentMove = Arcanine.Move.flamethrower;
+                }
+                else if (enemyChoice == 4)
+                {
+                    arcanine.CurrentMove = Arcanine.Move.howl;
+                }
+            }*/
+            snorlax.Update(gameTime);
+            if (snorlax.CanAct && currentEnemy == Enemy.Arcanine)
+            {
                 enemyHealthBar.Width = (int)(235 * (float)arcanine.HealthCurrent / arcanine.Health);
             }
             arcanine.Update(gameTime);

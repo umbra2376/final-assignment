@@ -22,7 +22,7 @@ namespace Pokemon
         private bool _hyper_hit, _canAct, _defenseBoost;
         private string _move1, _move2, _move3, _move4, _move_type, _name;
         private int _speed, _health, _defense, _attack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
-        private float _battle_time, _frame_time, _hyper_interval, _alpha, _text_time, _move1Damage, _move2Damage, _move3Damage, _defenseCurlEffect;
+        private float _battle_time, _frame_time, _hyper_interval, _alpha, _text_time, _defenseCurlEffect;
         private Arcanine _arcanine;
         public enum Move
         {
@@ -34,9 +34,8 @@ namespace Pokemon
         }
         private Move _currentMove;
         private Text _text;
-        public Snorlax(Texture2D texture, Texture2D hyperTexture, Texture2D impactTexture, Texture2D defenseCurl, Rectangle location, Arcanine arcanine)
+        public Snorlax(Texture2D texture, Texture2D hyperTexture, Texture2D impactTexture, Texture2D defenseCurl, Rectangle location)
         {
-            _arcanine = arcanine;
             _texture = texture;
             _hyperTexture = hyperTexture;
             _impactTexture = impactTexture;
@@ -67,9 +66,6 @@ namespace Pokemon
             _defenseBoost = false;
             _currentMove = Move.none;
             _text = Text.none;
-            _move1Damage = ((((2 * 50 + 10) / 10) * ((float)_attack / _arcanine.Defense) * 70 + 2) / 50);
-            _move2Damage = ((((2 * 50 + 10) / 10) * ((float)_attack / _arcanine.Defense) * 80 + 2) / 50);
-            _move3Damage = ((((2 * 50 + 10) / 10) * ((float)_attack / _arcanine.Defense) * 150 + 2) / 50);
             _defenseCurlEffect = (float)(_defense * 0.67);
         }
 
@@ -213,6 +209,18 @@ namespace Pokemon
         {
             get { return _speed; }
         }
+        public int Attack
+        {
+            get { return _attack; } 
+        }
+        public int Defense
+        {
+            get { return _defense; }
+        }
+        public int SDefense
+        {
+            get { return _sDefense; }
+        }
         public string Move1
         {
             get { return _move1; }
@@ -252,18 +260,6 @@ namespace Pokemon
         {
             get { return _move4_PP; }
             set { _move4_PP = value; }
-        }
-        public float Move1Damage
-        {
-            get { return _move1Damage; }
-        }
-        public float Move2Damage
-        {
-            get { return _move2Damage; }
-        }
-        public float Move3Damage
-        {
-            get { return _move3Damage; }
         }
         public float TextTime
         {

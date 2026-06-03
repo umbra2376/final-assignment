@@ -18,9 +18,9 @@ namespace Pokemon
     {
         private Texture2D _Wtexture, _Otexture, _blastTexture, _blastImpact;
         private Rectangle _Olocation, _Wlocation, _blastLocation;
-        private bool _wild;
+        private bool _wild, _canAct;
         private string _move1, _move2, _move3, _move4, _name;
-        private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
+        private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _crit;
         private float _battle_time, _frame_time;
         private int _healtCurrent;
         public enum Move
@@ -30,6 +30,8 @@ namespace Pokemon
         private Move _currentMove;
         public Arcanine(Texture2D Wtexture, Texture2D Otexture, Texture2D BlastTexture, Texture2D BlastImpact, Rectangle Olocation, Rectangle Wlocation)
         {
+            _wild = true;
+            _canAct = true;
             _Wtexture = Wtexture;
             _Otexture = Otexture;
             _blastTexture = BlastTexture;
@@ -58,11 +60,15 @@ namespace Pokemon
             _sAttack = stats.Next(90, 111);
             _sDefense = stats.Next(70, 91);
             _currentMove = Move.none;
-            _wild = true;
         }
 
         public void Update(GameTime gametime)
         {
+            if (_currentMove == Move.fireblast)
+            {
+                _canAct = false;
+                _currentMove = Move.none;
+            }
         }
         public Move CurrentMove
         {
@@ -133,12 +139,20 @@ namespace Pokemon
         {
             get { return _name; }
         }
+        public bool CanAct
+        {
+            get { return _canAct; }
+            set { _canAct = value; }
+        }
         public void Draw(SpriteBatch spriteBatch)
         {
             if (_wild)
             {
                 spriteBatch.Draw(_Wtexture, _Wlocation, Color.White);
-                spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
+                if (_currentMove == Move.fireblast)
+                {
+                    spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
+                }
             }
             else
             {
