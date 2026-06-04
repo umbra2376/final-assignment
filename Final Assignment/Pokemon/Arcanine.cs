@@ -17,21 +17,27 @@ namespace Pokemon
     class Arcanine
     {
         private Texture2D _Wtexture, _Otexture, _blastTexture, _blastImpact;
-        private Rectangle _Olocation, _Wlocation, _blastLocation;
-        private bool _wild, _canAct;
+        private Rectangle _Olocation, _Wlocation, _blastLocation, _enemyHitbox, _impactLocation;
+        private bool _wild, _canAct, _blastHit;
         private string _move1, _move2, _move3, _move4, _name;
         private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _crit;
-        private float _battle_time, _frame_time;
+        private float _battle_time, _frame_time, _textTime, _blastInterval;
         private int _healtCurrent;
         public enum Move
         {
             flamethrower, crunch, fireblast, howl, none
         }
+        public enum Text
+        {
+            flamethrower, crunch, fireblast, howl, none
+        }
         private Move _currentMove;
+        private Text _currentText;
         public Arcanine(Texture2D Wtexture, Texture2D Otexture, Texture2D BlastTexture, Texture2D BlastImpact, Rectangle Olocation, Rectangle Wlocation)
         {
             _wild = true;
             _canAct = true;
+            _blastHit = false;
             _Wtexture = Wtexture;
             _Otexture = Otexture;
             _blastTexture = BlastTexture;
@@ -47,10 +53,12 @@ namespace Pokemon
             _move2_PP = 15;
             _move3_PP = 5;
             _move4_PP = 40;
+            _blastInterval = 0.05f;
             if (_wild)
             {
-                _blastLocation = new Rectangle(610, 90, 300, 200);
+                _blastLocation = new Rectangle(400, 180, 300, 200);
             }
+            _enemyHitbox = new Rectangle(120, 283, 200, 200);
             Random stats = new Random();
             _speed = stats.Next(80, 111);
             _health = stats.Next(80, 101);
@@ -64,10 +72,27 @@ namespace Pokemon
 
         public void Update(GameTime gametime)
         {
-            if (_currentMove == Move.fireblast)
+            if (_currentMove == Move.fireblast && _wild)
             {
                 _canAct = false;
-                _currentMove = Move.none;
+                _currentText = Text.fireblast;
+                _textTime += (float)gametime.ElapsedGameTime.TotalSeconds;
+                _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
+                _frame_time += (float)gametime.ElapsedGameTime.TotalSeconds;
+                if (!_blastHit && _frame_time >= _blastInterval)
+                {
+                    _blastLocation.Width += 5;
+                    _blastLocation.Height += 1;
+                    _blastLocation.X -= 5;
+                    _frame_time = 0;
+                }
+                else if (_blastLocation.Intersects(_enemyHitbox))
+                {
+                    _blastHit = true;
+                    _blastLocation.Width -= 5;
+                    _blastLocation.Y += 5;
+                    _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
+                }
             }
         }
         public Move CurrentMove
@@ -152,6 +177,8 @@ namespace Pokemon
                 if (_currentMove == Move.fireblast)
                 {
                     spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
+                    if (_blastHit)
+                        spriteBatch.Draw(_blastImpact, _impactLocation, Color.White);
                 }
             }
             else

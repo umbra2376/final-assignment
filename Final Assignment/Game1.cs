@@ -19,6 +19,7 @@ namespace Final_Assignment
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText;
         int healthAmount, totalHealth, charSpeed, enemySpeed, enemyChoice, crit, Snoremove1Damage, Snoremove2Damage, Snoremove3Damage;
         float charHealth, enemyHealth;
+        bool enemyAction;
         Random enemyMove = new Random();
         enum Pokemon
         {
@@ -74,6 +75,7 @@ namespace Final_Assignment
             enemyHealthImg = new Rectangle(70, 50, 370, 100);
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
             enemyNameText = new Vector2(100, 40);
+            enemyAction = false;
             arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
             snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
             currentPokemon = Pokemon.Snorlax;
@@ -127,7 +129,7 @@ namespace Final_Assignment
             blastImpact = Content.Load<Texture2D>("blastImpact");
             // TODO: use this.Content to load your game content here
         }
-
+        bool feet = true;
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -192,12 +194,14 @@ namespace Final_Assignment
                     }
                 }
         }
-            /*if (currentTurn == Turn.enemyTurn && currentEnemy == Enemy.Arcanine && arcanine.CanAct)
+            if (currentTurn == Turn.enemyTurn && currentEnemy == Enemy.Arcanine && arcanine.CanAct)
             {
                 enemyChoice = enemyMove.Next(1, 5);
                 if (enemyChoice == 1)
                 {
+                    enemyAction = true;
                     arcanine.CurrentMove = Arcanine.Move.fireblast;
+                    snorlax.GotHit = true;
                 }
                 else if (enemyChoice == 2)
                 {
@@ -211,13 +215,18 @@ namespace Final_Assignment
                 {
                     arcanine.CurrentMove = Arcanine.Move.howl;
                 }
-            }*/
+            }
             snorlax.Update(gameTime);
             if (snorlax.CanAct && currentEnemy == Enemy.Arcanine)
             {
                 enemyHealthBar.Width = (int)(235 * (float)arcanine.HealthCurrent / arcanine.Health);
             }
             arcanine.Update(gameTime);
+            if (arcanine.CanAct && currentPokemon == Pokemon.Snorlax)
+            {
+                enemyHealthBar.Width = (int)(235 * (float)arcanine.HealthCurrent / arcanine.Health);
+                enemyAction = false;
+            }
             oldState = currentState;
             base.Update(gameTime);
         }
