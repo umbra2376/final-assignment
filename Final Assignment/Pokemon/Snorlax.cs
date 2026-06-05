@@ -21,7 +21,7 @@ namespace Pokemon
         private Rectangle _location, _hyper_Location, _impact_Location, _enemy_Location, _enemy_Hitbox;
         private bool _hyper_hit, _canAct, _defenseBoost, _gotHit;
         private string _move1, _move2, _move3, _move4, _move_type, _name;
-        private int _speed, _health, _defense, _attack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
+        private int _speed, _health, _defense, _attack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _healthCurrent;
         private float _battle_time, _frame_time, _hyper_interval, _alpha, _text_time, _defenseCurlEffect;
         private Arcanine _arcanine;
         public enum Move
@@ -58,6 +58,7 @@ namespace Pokemon
             _defense = stats.Next(50, 81);
             _attack = stats.Next(100, 121);
             _sDefense = stats.Next(100, 121);
+            _healthCurrent = _health;
             _hyper_Location = new Rectangle(300, 300, 150, 300);
             _enemy_Location = new Rectangle(610, 90, 300, 300);
             _enemy_Hitbox = new Rectangle(800, 90, 200, 200);
@@ -275,6 +276,11 @@ namespace Pokemon
             get { return _gotHit; }
             set { _gotHit = value; }
         }
+        public int HealthCurrent
+        {
+            get { return _healthCurrent; }
+            set { _healthCurrent = value; }
+        }
         public void Draw(SpriteBatch spriteBatch)
         {
             if (_currentMove == Move.hyperBeam)
@@ -285,10 +291,10 @@ namespace Pokemon
                     spriteBatch.Draw(_impactTexture, _impact_Location, Color.White);
                 }
             }
-            if (!_gotHit)
-                spriteBatch.Draw(_texture, _location, Color.White);
-            else
+            if (_gotHit)
                 spriteBatch.Draw(_texture, _location, Color.Red);
+            else
+                spriteBatch.Draw(_texture, _location, Color.White);
             if (_currentMove == Move.defenseCurl)
             {
                 _alpha = 0f;

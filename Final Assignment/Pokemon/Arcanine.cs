@@ -86,12 +86,23 @@ namespace Pokemon
                     _blastLocation.X -= 5;
                     _frame_time = 0;
                 }
-                else if (_blastLocation.Intersects(_enemyHitbox))
+                if (_blastLocation.Intersects(_enemyHitbox))
                 {
                     _blastHit = true;
                     _blastLocation.Width -= 5;
                     _blastLocation.Y += 5;
                     _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
+                }
+                if (_battle_time >= 3 && _textTime >= 3)
+                {
+                    _currentMove = Move.none;
+                    _currentText = Text.none;
+                    _canAct = true;
+                    _blastHit = false;
+                    _textTime = 0;
+                    _battle_time = 0;
+                    _frame_time = 0;
+                    _blastLocation = new Rectangle(400, 180, 300, 200);
                 }
             }
         }
@@ -99,6 +110,11 @@ namespace Pokemon
         {
             get { return _currentMove; }
             set { _currentMove = value; }
+        }
+        public Text CurrentText
+        {
+            get { return _currentText; } 
+            set { _currentText = value; }
         }
         public int Health
         {
@@ -169,6 +185,10 @@ namespace Pokemon
             get { return _canAct; }
             set { _canAct = value; }
         }
+        public float TextTime
+        {
+            get { return _textTime; }
+        }
         public void Draw(SpriteBatch spriteBatch)
         {
             if (_wild)
@@ -177,7 +197,7 @@ namespace Pokemon
                 if (_currentMove == Move.fireblast)
                 {
                     spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
-                    if (_blastHit)
+                    if (_blastHit && _battle_time <= 3)
                         spriteBatch.Draw(_blastImpact, _impactLocation, Color.White);
                 }
             }
