@@ -18,7 +18,7 @@ namespace Pokemon
     {
         private Texture2D _Wtexture, _Otexture, _blastTexture, _blastImpact;
         private Rectangle _Olocation, _Wlocation, _blastLocation, _enemyHitbox, _impactLocation;
-        private bool _wild, _canAct, _blastHit;
+        private bool _wild, _canAct, _blastHit, _doneMove;
         private string _move1, _move2, _move3, _move4, _name;
         private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _crit;
         private float _battle_time, _frame_time, _textTime, _blastInterval;
@@ -37,6 +37,7 @@ namespace Pokemon
         {
             _wild = true;
             _canAct = true;
+            _doneMove = true;
             _blastHit = false;
             _Wtexture = Wtexture;
             _Otexture = Otexture;
@@ -75,6 +76,7 @@ namespace Pokemon
             if (_currentMove == Move.fireblast && _wild)
             {
                 _canAct = false;
+                _doneMove = false;
                 _currentText = Text.fireblast;
                 _textTime += (float)gametime.ElapsedGameTime.TotalSeconds;
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
@@ -99,6 +101,7 @@ namespace Pokemon
                     _currentText = Text.none;
                     _canAct = true;
                     _blastHit = false;
+                    _doneMove = true;
                     _textTime = 0;
                     _battle_time = 0;
                     _frame_time = 0;
@@ -139,6 +142,14 @@ namespace Pokemon
         public int SDefense
         {
             get { return _sDefense; }
+        }
+        public int SAttack
+        {
+            get { return _sAttack; }
+        }
+        public int Attack
+        {
+            get { return _attack; }
         }
         public string Move1
         {
@@ -188,6 +199,10 @@ namespace Pokemon
         public float TextTime
         {
             get { return _textTime; }
+        }
+        public bool DoneMove
+        {
+            get { return _doneMove; }
         }
         public void Draw(SpriteBatch spriteBatch)
         {

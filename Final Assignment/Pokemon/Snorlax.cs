@@ -19,7 +19,7 @@ namespace Pokemon
     {
         private Texture2D _texture, _hyperTexture, _impactTexture, _defenseTexture;
         private Rectangle _location, _hyper_Location, _impact_Location, _enemy_Location, _enemy_Hitbox;
-        private bool _hyper_hit, _canAct, _defenseBoost, _gotHit;
+        private bool _hyper_hit, _canAct, _defenseBoost, _gotHit, _doneMove;
         private string _move1, _move2, _move3, _move4, _move_type, _name;
         private int _speed, _health, _defense, _attack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _healthCurrent;
         private float _battle_time, _frame_time, _hyper_interval, _alpha, _text_time, _defenseCurlEffect;
@@ -68,6 +68,7 @@ namespace Pokemon
             _defenseBoost = false;
             _currentMove = Move.none;
             _text = Text.none;
+            _doneMove = true;
             _defenseCurlEffect = (float)(_defense * 0.67);
         }
 
@@ -76,6 +77,7 @@ namespace Pokemon
             if (_currentMove == Move.headbutt)
             {
                 _canAct = false;
+                _doneMove = false;
                 _text = Text.headbutt;
                 _text_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
@@ -100,11 +102,13 @@ namespace Pokemon
                     _frame_time = 0;
                     _text_time = 0;
                     _canAct = true;
+                    _doneMove = true;
                 }
             }
             if (_currentMove == Move.bodyPress)
             {
                 _canAct = false;
+                _doneMove = false;
                 _text = Text.bodyPress;
                 _text_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
@@ -132,11 +136,13 @@ namespace Pokemon
                     _frame_time = 0;
                     _text_time = 0;
                     _canAct = true;
+                    _doneMove = true;
                 }
             }
             if (_currentMove == Move.hyperBeam)
             {
                 _canAct = false;
+                _doneMove = false;
                 _text = Text.hyperBeam;
                 _text_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
@@ -163,11 +169,13 @@ namespace Pokemon
                     _hyper_Location.Width = 150;
                     _hyper_Location.Y = 300;
                     _canAct = true;
+                    _doneMove = true;
                 }
             }
             if (_currentMove == Move.defenseCurl)
             {
                 _canAct = false;
+                _doneMove = false;
                 _text = Text.defenseCurl;
                 _text_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
@@ -183,6 +191,7 @@ namespace Pokemon
                     _battle_time = 0;
                     _text_time = 0;
                     _canAct = true;
+                    _doneMove = true;
                     _defenseBoost = false;
                 }
             }
@@ -310,5 +319,9 @@ namespace Pokemon
             }
         }
 
+        internal void Update(object gameTime)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
