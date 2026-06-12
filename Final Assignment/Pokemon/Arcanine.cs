@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace Pokemon
 {
     class Arcanine
@@ -21,7 +20,7 @@ namespace Pokemon
         private Rectangle _Olocation, _Wlocation, _blastLocation, _enemyHitbox, _impactLocation, _crunchLocation, _flameLocation, _howlLocation;
         private bool _wild, _canAct, _blastHit, _attackBoost;
         private string _move1, _move2, _move3, _move4, _name;
-        private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP, _crit;
+        private int _speed, _health, _defense, _attack, _sAttack, _sDefense, _move1_PP, _move2_PP, _move3_PP, _move4_PP;
         private float _battle_time, _frame_time, _textTime, _blastInterval, _alpha, _howlEffect;
         private int _healtCurrent;
         public enum Move
@@ -78,8 +77,6 @@ namespace Pokemon
             _howlEffect = (float)(_attack * 0.67);
             _currentMove = Move.none;
         }
-
-
         public void Update(GameTime gametime)
         {
             if (_currentMove == Move.flamethrower && _wild)
@@ -209,15 +206,11 @@ namespace Pokemon
             get { return _health; }
             set { _health = value; }
         }
-
-
         public int HealthCurrent
         {
             get { return _healtCurrent; }
             set { _healtCurrent = value; }
         }
-
-
         public int Speed
         {
             get { return _speed; }

@@ -5,7 +5,6 @@ using Pokemon;
 using System;
 using System.Collections.Generic;
 
-
 namespace Final_Assignment
 {
     public class Game1 : Game
@@ -14,17 +13,19 @@ namespace Final_Assignment
         private SpriteBatch _spriteBatch;
         KeyboardState currentState, oldState;
         SpriteFont menuFont, healthFont;
-        Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox;
+        Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, catchingArrow, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox, catchPokemon;
+        Rectangle ballLocation;
         Snorlax snorlax;
         Arcanine arcanine;
         Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture;
-        Texture2D intro1, intro2, losingScreen;
-        Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText;
-        int charSpeed, enemySpeed, enemyChoice, crit, introFrame;
+        Texture2D losingScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen;
+        Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText, yesText, noText;
+        int charSpeed, enemySpeed, enemyChoice, crit, catchSuccess, introFrame, ballFrame, shakeCount;
         int Snoremove1Damage, Snoremove2Damage, Snoremove3Damage, Arcmove1Damage, Arcmove2Damage, Arcmove3Damage;
-        bool enemyAction;
-        float frameTime;
+        bool catchSelection, inBall;
+        float frameTime, shakeTimer;
         Random enemyMove = new Random();
+        Random catchRate = new Random();
         enum BattleState
         {
             playerInput, playerAction, enemyAction, animation, turnEnd
@@ -59,13 +60,13 @@ namespace Final_Assignment
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
-
-
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
             base.Initialize();
             introFrame = 0;
+            ballFrame = 0;
+            shakeCount = 0;
             window = new Rectangle(0, 0, 1000, 800);
             _graphics.PreferredBackBufferWidth = window.Width;
             _graphics.PreferredBackBufferHeight = window.Height;
@@ -84,17 +85,23 @@ namespace Final_Assignment
             movePP = new Vector2(740, 670);
             charNameText = new Vector2(615, 370);
             totalHealthText = new Vector2(830, 460);
+            yesText = new Vector2(780, 600);
+            noText = new Vector2(790, 670);
             healthAmountText = new Vector2(777, 460);
             arrowSize = new Rectangle(20, 600, 50, 60);
+            catchingArrow = new Rectangle(720, 600, 50, 60);
             charHealthImg = new Rectangle(570, 390, 370, 100);
             charIconSize = new Rectangle(530, 340, 460, 200);
             charHealthBar = new Rectangle(670, 428, 235, 30);
             enemyIconSize = new Rectangle(20, 20, 460, 150);
             enemyHealthImg = new Rectangle(70, 50, 370, 100);
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
+            catchPokemon = new Rectangle(350, 250, 300, 300);
+            ballLocation = new Rectangle(320, 220, 80, 80);
             enemyNameText = new Vector2(100, 40);
-            enemyAction = false;
-            screen = Screen.Intro;
+            catchSelection = false;
+            inBall = false;
+            screen = Screen.Catching;
             arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
             snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
             currentPokemon = Pokemon.Snorlax;
@@ -111,7 +118,7 @@ namespace Final_Assignment
             {
                 Snoremove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 70 + 2) / 50);
                 Snoremove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 80 + 2) / 50);
-                Snoremove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 150 + 2) / 50);
+                Snoremove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 150 + 2) / 50) * 3;
             }
             if (currentEnemy == Enemy.Arcanine && currentPokemon == Pokemon.Snorlax)
             {
@@ -130,14 +137,15 @@ namespace Final_Assignment
                 currentTurn = Turn.enemyTurn;
             }
         }
-
-
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            intro.Add(intro1 = Content.Load<Texture2D>("pokeIntroFinal(1)"));
-            intro.Add(intro2 = Content.Load<Texture2D>("pokeIntroFinal(2)"));
+            intro.Add(Content.Load<Texture2D>("pokeIntroFinal(1)"));
+            intro.Add(Content.Load<Texture2D>("pokeIntroFinal(2)"));
             losingScreen = Content.Load<Texture2D>("losingScreen");
+            catchingBackground = Content.Load<Texture2D>("catchBackground");
+            catchingMenu = Content.Load<Texture2D>("catchingMenu");
+            catchingMenu2 = Content.Load<Texture2D>("catchingMenu2");
             snorlaxTexture = Content.Load<Texture2D>("snorlax");
             AWtexture = Content.Load<Texture2D>("arcanine");
             AOtexture = Content.Load<Texture2D>("ownedArcanine");
@@ -157,14 +165,16 @@ namespace Final_Assignment
             crunchTexture = Content.Load<Texture2D>("crunch");
             flamethrowerTexture = Content.Load<Texture2D>("flamethrower");
             howlTexture = Content.Load<Texture2D>("Howl");
+            ballOpen = Content.Load<Texture2D>("pokeBallFail");
+            catching.Add(Content.Load<Texture2D>("pokeBall1"));
+            catching.Add(Content.Load<Texture2D>("pokeBall2"));
+            catching.Add(Content.Load<Texture2D>("pokeBall3"));
             // TODO: use this.Content to load your game content here
         }
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-
             // TODO: Add your update logic here
             currentState = Keyboard.GetState();
             if (screen == Screen.Intro)
@@ -205,23 +215,15 @@ namespace Final_Assignment
                     case BattleState.playerInput:
                         PlayerInput();
                         break;
-
-
                     case BattleState.playerAction:
                         PlayerAction();
                         break;
-
-
                     case BattleState.enemyAction:
                         EnemyAction();
                         break;
-
-
                     case BattleState.animation:
                         Animation(gameTime);
                         break;
-
-
                     case BattleState.turnEnd:
                         TurnEnd();
                         break;
@@ -244,17 +246,78 @@ namespace Final_Assignment
                         frameTime = 0;
                     }
                 }
-                oldState = currentState;
-                base.Update(gameTime);
             }
-        }
+            if (screen == Screen.Catching)
+            {
+                frameTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (catchingArrow.Y == 600 && currentState.IsKeyDown(Keys.Down))
+                    catchingArrow.Y = 670;
+                if (catchingArrow.Y == 670 && currentState.IsKeyDown(Keys.Up))
+                    catchingArrow.Y = 600;
+                if (catchingArrow.Y == 600 && !catchSelection)
+                {
+                    if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
+                    {
+                        catchSelection = true;
+                        catchSuccess = catchRate.Next(0, 10);
+                    }
+                }
+                if (catchSelection && frameTime <= 3 && catchPokemon.Width >= 0)
+                {
+                    catchPokemon.Width -= 5;
+                    catchPokemon.Height -= 5;
+                }
+                if (frameTime >= 3)
+                {
+                    catchSelection = false;
+                    inBall = true;
+                    frameTime = 0;
+                    ballFrame = 0;
+                    shakeCount = 0;
+                    shakeTimer = 0f;
+                }
+                if (inBall)
+                {
+                    shakeTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (shakeCount < 3)
+                    {
+                        if (shakeTimer >= 0.5f)
+                        {
+                            shakeTimer = 0;
+                            if (ballFrame == 0)
+                                ballFrame = 1;
+                            if (ballFrame == 1)
+                                ballFrame = 2;
+                            else
+                            {
+                                ballFrame = 0;
+                                shakeCount++;
+                            }
+                        }
+                    }
+                    else if (shakeCount >= 3)
+                    {
+                        if (catchSuccess <= 7)
+                        {
+                            ballFrame = 0;
+                        }
+                        else
+                        {
+                            inBall = false;
+                            catchPokemon.Width = 300;
+                            catchPokemon.Height = 300;
 
+                        }
+                    }
+                }
+            }
+            oldState = currentState;
+            base.Update(gameTime);
+        }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
-
-
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
             if (screen == Screen.Intro)
@@ -312,7 +375,6 @@ namespace Final_Assignment
                     _spriteBatch.DrawString(healthFont, Pokemon.Snorlax.ToString(), charNameText, Color.Black);
                     _spriteBatch.DrawString(healthFont, "/" + Convert.ToString(snorlax.Health), totalHealthText, Color.Black);
                     _spriteBatch.DrawString(healthFont, Convert.ToString(snorlax.HealthCurrent), healthAmountText, Color.Black);
-
 
                     if (snorlax.CurrentText == Snorlax.Text.bodyPress && snorlax.TextTime <= 3)
                     {
@@ -374,16 +436,33 @@ namespace Final_Assignment
             {
                 _spriteBatch.Draw(losingScreen, window, Color.White);
             }
+            if (screen == Screen.Catching)
+            {
+                _spriteBatch.Draw(catchingBackground, window, Color.White);
+                _spriteBatch.Draw(catchingMenu, menuLocation, Color.White);
+                _spriteBatch.Draw(catchingMenu2, moveInfoLocation, Color.White);
+                _spriteBatch.DrawString(menuFont, "Would you like to attempt", moveName1, Color.White);
+                _spriteBatch.DrawString(menuFont, "to catch this pokemon?", moveName2, Color.White);
+                _spriteBatch.Draw(arrow, catchingArrow, Color.LightBlue);
+                _spriteBatch.DrawString(menuFont, "Yes", yesText, Color.White);
+                _spriteBatch.DrawString(menuFont, "No", noText, Color.White);
+                if (catchSelection)
+                {
+                    _spriteBatch.Draw(ballOpen, ballLocation, Color.White);
+                }
+                if (currentEnemy == Enemy.Arcanine && !inBall)
+                    _spriteBatch.Draw(AWtexture, catchPokemon, Color.White);
+                if (inBall)
+                {
+                    _spriteBatch.Draw(catching[ballFrame], ballLocation, Color.White);
+                }
+            }
             _spriteBatch.End();
-
-
             base.Draw(gameTime);
         }
         void PlayerInput()
         {
             if (!snorlax.CanAct) return;
-
-
             if (arrowSize.X == 20 && arrowSize.Y == 600 && snorlax.CanAct)
             {
                 if (currentState.IsKeyDown(Keys.A) && oldState.IsKeyUp(Keys.A))
@@ -464,8 +543,6 @@ namespace Final_Assignment
                         snorlax.HealthCurrent = 0;
                     charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
                     break;
-
-
                 case 2:
                     arcanine.CurrentMove = Arcanine.Move.crunch;
                     snorlax.HealthCurrent -= Arcmove2Damage;
@@ -473,8 +550,6 @@ namespace Final_Assignment
                         snorlax.HealthCurrent = 0;
                     charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
                     break;
-
-
                 case 3:
                     arcanine.CurrentMove = Arcanine.Move.fireblast;
                     snorlax.HealthCurrent -= Arcmove3Damage;
@@ -482,8 +557,6 @@ namespace Final_Assignment
                         snorlax.HealthCurrent = 0;
                     charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
                     break;
-
-
                 case 4:
                     arcanine.CurrentMove = Arcanine.Move.howl;
                     break;
@@ -504,10 +577,8 @@ namespace Final_Assignment
             snorlax.CanAct = true;
             arcanine.CanAct = true;
 
-
             snorlax.CurrentMove = Snorlax.Move.none;
             arcanine.CurrentMove = Arcanine.Move.none;
-
 
             if (currentTurn == Turn.enemyTurn)
                 battleState = BattleState.enemyAction;

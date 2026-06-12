@@ -222,7 +222,7 @@ namespace Pokemon
         }
         public int Attack
         {
-            get { return _attack; } 
+            get { return _attack; }
         }
         public int Defense
         {
