@@ -25,6 +25,12 @@
 /processorParam:TextureFormat=Color
 /build:arcanine.psd
 
+#begin battleMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:battleMusic.mp3
+
 #begin blastBeam.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -85,6 +91,12 @@
 /processorParam:TextureFormat=Color
 /build:catchingMenu2.jpg
 
+#begin catchingMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:catchingMusic.mp3
+
 #begin crunch.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -109,6 +121,12 @@
 /processorParam:TextureFormat=Color
 /build:defenseCurl.psd
 
+#begin defenseSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:defenseSound.mp3
+
 #begin flamethrower.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,6 +138,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:flamethrower.psd
+
+#begin flamethrowerSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:flamethrowerSound.mp3
 
 #begin grassBattlefield.psd
 /importer:TextureImporter
@@ -272,6 +296,12 @@
 /processorParam:TextureFormat=Color
 /build:pokeBallFail.psd
 
+#begin pokeballShaking.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:pokeballShaking.mp3
+
 #begin pokeFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -305,6 +335,18 @@
 
 #begin pokemonFont.ttf
 /copy:pokemonFont.ttf
+
+#begin sandBattlefield.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sandBattlefield.psd
 
 #begin select.webp
 /importer:TextureImporter
@@ -342,6 +384,24 @@
 /processorParam:TextureFormat=Color
 /build:starterMoveset.png
 
+#begin successfulCatch.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:successfulCatch.psd
+
+#begin tackle.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:tackle.mp3
+
 #begin tile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -353,4 +413,22 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tile.png
+
+#begin titleTheme.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:titleTheme.mp3
+
+#begin WElectivire.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:WElectivire.psd
 

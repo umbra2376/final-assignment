@@ -12,6 +12,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
+
 namespace Pokemon
 {
     class Arcanine
@@ -77,6 +80,10 @@ namespace Pokemon
             _howlEffect = (float)(_attack * 0.67);
             _currentMove = Move.none;
         }
+
+
+
+
         public void Update(GameTime gametime)
         {
             if (_currentMove == Move.flamethrower && _wild)
@@ -206,11 +213,19 @@ namespace Pokemon
             get { return _health; }
             set { _health = value; }
         }
+
+
+
+
         public int HealthCurrent
         {
             get { return _healtCurrent; }
             set { _healtCurrent = value; }
         }
+
+
+
+
         public int Speed
         {
             get { return _speed; }
@@ -279,6 +294,11 @@ namespace Pokemon
         public float TextTime
         {
             get { return _textTime; }
+        }
+        public bool Wild
+        {
+            get { return _wild; }
+            set { _wild = value; }
         }
         public void Draw(SpriteBatch spriteBatch)
         {

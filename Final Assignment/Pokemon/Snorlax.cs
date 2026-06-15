@@ -13,6 +13,7 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Pokemon
 {
     class Snorlax
@@ -68,6 +69,7 @@ namespace Pokemon
             _text = Text.none;
             _defenseCurlEffect = (float)(_defense * 0.67);
         }
+
 
         public void Update(GameTime gametime)
         {
@@ -312,3 +314,9 @@ namespace Pokemon
         }
     }
 }
+
+
+
+
+
+

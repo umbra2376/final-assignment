@@ -1,9 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using Pokemon;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+
 
 namespace Final_Assignment
 {
@@ -13,16 +17,20 @@ namespace Final_Assignment
         private SpriteBatch _spriteBatch;
         KeyboardState currentState, oldState;
         SpriteFont menuFont, healthFont;
+        SoundEffect flamethrower, physical, defenseSound, pokeBallShaking;
+        SoundEffectInstance pokeBall;
+        Song battleMusic, catchingMusic, titleMusic;
         Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, catchingArrow, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox, catchPokemon;
-        Rectangle ballLocation;
+        Rectangle ballLocation, catchStarLocation;
         Snorlax snorlax;
         Arcanine arcanine;
-        Texture2D snorlaxTexture, AOtexture, AWtexture, menu, healthbar, healthIcon, battleImg, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture;
-        Texture2D losingScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen;
+        Electivire electivire;
+        Texture2D snorlaxTexture, AOtexture, AWtexture, EWTexture, EOTexture, menu, healthbar, healthIcon, battle1Img, battle2Img, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture;
+        Texture2D losingScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen, catchStar;
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText, yesText, noText;
         int charSpeed, enemySpeed, enemyChoice, crit, catchSuccess, introFrame, ballFrame, shakeCount;
         int Snoremove1Damage, Snoremove2Damage, Snoremove3Damage, Arcmove1Damage, Arcmove2Damage, Arcmove3Damage;
-        bool catchSelection, inBall;
+        bool catchSelection, inBall, battle2Ready;
         float frameTime, shakeTimer;
         Random enemyMove = new Random();
         Random catchRate = new Random();
@@ -32,11 +40,11 @@ namespace Final_Assignment
         }
         enum Pokemon
         {
-            Snorlax, Ninetails, Arcanine, Flygon, Sceptile, Electivire
+            Snorlax, Arcanine, Sceptile, Electivire
         }
         enum Enemy
         {
-            Arcanine, Ninetails, Flygon, Sceptile, Electivire
+            Arcanine, Sceptile, Electivire
         }
         enum Turn
         {
@@ -46,13 +54,19 @@ namespace Final_Assignment
         {
             Intro, Battle, Catching, Lose, End
         }
+        enum Battle
+        {
+            First, Second, Third
+        }
         private Turn currentTurn;
         private Screen screen;
         private Pokemon currentPokemon;
         private Enemy currentEnemy;
         private BattleState battleState;
+        private Battle battle;
         List<Texture2D> intro = new List<Texture2D>();
         List<Texture2D> catching = new List<Texture2D>();
+
 
         public Game1()
         {
@@ -98,44 +112,18 @@ namespace Final_Assignment
             enemyHealthBar = new Rectangle(170, 88, 235, 30);
             catchPokemon = new Rectangle(350, 250, 300, 300);
             ballLocation = new Rectangle(320, 220, 80, 80);
+            catchStarLocation = new Rectangle(300, 220, 60, 60);
             enemyNameText = new Vector2(100, 40);
             catchSelection = false;
             inBall = false;
-            screen = Screen.Catching;
-            arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(120, 283, 300, 300), new Rectangle(610, 90, 300, 300));
+            battle2Ready = false;
+            screen = Screen.Intro;
+            battle = Battle.First;
+            arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(220, 383, 300, 300), new Rectangle(610, 90, 300, 300));
             snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
+            electivire = new Electivire(EWTexture, EOTexture, new Rectangle(220, 383, 300, 300), new Rectangle(610, 90, 300, 300));
             currentPokemon = Pokemon.Snorlax;
             currentEnemy = Enemy.Arcanine;
-            if (currentPokemon == Pokemon.Snorlax)
-            {
-                charSpeed = snorlax.Speed;
-            }
-            if (currentEnemy == Enemy.Arcanine)
-            {
-                enemySpeed = arcanine.Speed;
-            }
-            if (currentPokemon == Pokemon.Snorlax && currentEnemy == Enemy.Arcanine)
-            {
-                Snoremove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 70 + 2) / 50);
-                Snoremove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 80 + 2) / 50);
-                Snoremove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 150 + 2) / 50) * 3;
-            }
-            if (currentEnemy == Enemy.Arcanine && currentPokemon == Pokemon.Snorlax)
-            {
-                Arcmove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.SAttack / snorlax.SDefense) * 70 + 2) / 50);
-                Arcmove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.Attack / snorlax.Defense) * 80 + 2) / 50);
-                Arcmove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.SAttack / snorlax.SDefense) * 150 + 2) / 50);
-            }
-            if (charSpeed >= enemySpeed)
-            {
-                battleState = BattleState.playerInput;
-                currentTurn = Turn.charTurn;
-            }
-            else
-            {
-                battleState = BattleState.enemyAction;
-                currentTurn = Turn.enemyTurn;
-            }
         }
         protected override void LoadContent()
         {
@@ -149,12 +137,14 @@ namespace Final_Assignment
             snorlaxTexture = Content.Load<Texture2D>("snorlax");
             AWtexture = Content.Load<Texture2D>("arcanine");
             AOtexture = Content.Load<Texture2D>("ownedArcanine");
+            EWTexture = Content.Load<Texture2D>("WElectivire");
             healthbar = Content.Load<Texture2D>("tile");
             healthIcon = Content.Load<Texture2D>("healthBar");
             menu = Content.Load<Texture2D>("starterMoveset");
             menuFont = Content.Load<SpriteFont>("pokeFont");
             healthFont = Content.Load<SpriteFont>("healthFont");
-            battleImg = Content.Load<Texture2D>("grassBattlefield");
+            battle1Img = Content.Load<Texture2D>("grassBattlefield");
+            battle2Img = Content.Load<Texture2D>("sandBattlefield");
             arrow = Content.Load<Texture2D>("select");
             nameIcon = Content.Load<Texture2D>("nameIcon");
             hyperBeam = Content.Load<Texture2D>("hyperBeam");
@@ -169,6 +159,19 @@ namespace Final_Assignment
             catching.Add(Content.Load<Texture2D>("pokeBall1"));
             catching.Add(Content.Load<Texture2D>("pokeBall2"));
             catching.Add(Content.Load<Texture2D>("pokeBall3"));
+            catchStar = Content.Load<Texture2D>("successfulCatch");
+
+            flamethrower = Content.Load<SoundEffect>("flamethrowerSound");
+            physical = Content.Load<SoundEffect>("tackle");
+            defenseSound = Content.Load<SoundEffect>("defenseSound");
+            pokeBallShaking = Content.Load<SoundEffect>("pokeballShaking");
+            pokeBall = pokeBallShaking.CreateInstance();
+            pokeBall.IsLooped = false;
+
+            battleMusic = Content.Load<Song>("battleMusic");
+            catchingMusic = Content.Load<Song>("catchingMusic");
+            titleMusic = Content.Load<Song>("titleTheme");
+            MediaPlayer.Volume = 0.3f;
             // TODO: use this.Content to load your game content here
         }
         protected override void Update(GameTime gameTime)
@@ -177,6 +180,21 @@ namespace Final_Assignment
                 Exit();
             // TODO: Add your update logic here
             currentState = Keyboard.GetState();
+            if (screen == Screen.Intro)
+            {
+                if (MediaPlayer.State != MediaState.Playing)
+                {
+                    MediaPlayer.IsRepeating = true;
+                    MediaPlayer.Play(titleMusic);
+                }
+            }
+            else
+            {
+                if (MediaPlayer.State == MediaState.Playing)
+                {
+                    MediaPlayer.Stop();
+                }
+            }
             if (screen == Screen.Intro)
             {
                 frameTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -189,27 +207,14 @@ namespace Final_Assignment
                     introFrame = 0;
                     frameTime = 0;
                 }
-                if (currentState.IsKeyDown(Keys.Enter))
-                    screen = Screen.Battle;
+                if (currentState.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+                    StartBattle(Battle.First);
             }
             if (screen == Screen.Battle)
             {
-                if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
-                    arrowSize.Y = 680;
-                else if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Right))
-                    arrowSize.X = 290;
-                else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
-                    arrowSize.Y = 600;
-                else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Right))
-                    arrowSize.X = 290;
-                else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
-                    arrowSize.Y = 680;
-                else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Left))
-                    arrowSize.X = 20;
-                else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
-                    arrowSize.Y = 600;
-                else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Left))
-                    arrowSize.X = 20;
+                MoveArrow();
+
+
                 switch (battleState)
                 {
                     case BattleState.playerInput:
@@ -243,6 +248,8 @@ namespace Final_Assignment
                     if (frameTime >= 3.5)
                     {
                         screen = Screen.Catching;
+                        MediaPlayer.Play(catchingMusic);
+
                         frameTime = 0;
                     }
                 }
@@ -262,12 +269,16 @@ namespace Final_Assignment
                         catchSuccess = catchRate.Next(0, 10);
                     }
                 }
-                if (catchSelection && frameTime <= 3 && catchPokemon.Width >= 0)
+                if (catchSelection && frameTime <= 3 && catchPokemon.Width > 0)
                 {
                     catchPokemon.Width -= 5;
                     catchPokemon.Height -= 5;
+                    if (catchPokemon.Width < 0)
+                        catchPokemon.Width = 0;
+                    if (catchPokemon.Height < 0)
+                        catchPokemon.Height = 0;
                 }
-                if (frameTime >= 3)
+                if (frameTime >= 3 && catchSelection)
                 {
                     catchSelection = false;
                     inBall = true;
@@ -278,6 +289,7 @@ namespace Final_Assignment
                 }
                 if (inBall)
                 {
+                    pokeBall.Play();
                     shakeTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (shakeCount < 3)
                     {
@@ -286,7 +298,7 @@ namespace Final_Assignment
                             shakeTimer = 0;
                             if (ballFrame == 0)
                                 ballFrame = 1;
-                            if (ballFrame == 1)
+                            else if (ballFrame == 1)
                                 ballFrame = 2;
                             else
                             {
@@ -295,25 +307,41 @@ namespace Final_Assignment
                             }
                         }
                     }
-                    else if (shakeCount >= 3)
+                    else
                     {
+                        ballFrame = 0;
                         if (catchSuccess <= 7)
                         {
-                            ballFrame = 0;
+                            inBall = false;
+                            currentPokemon = Pokemon.Arcanine;
+                            arcanine.Wild = true;
+                            shakeCount = 0;
+                            battle2Ready = true;
                         }
                         else
                         {
                             inBall = false;
                             catchPokemon.Width = 300;
                             catchPokemon.Height = 300;
-
+                            shakeCount = 0;
+                            battle2Ready = true;
                         }
+                    }
+                }
+                if (battle2Ready)
+                {
+                    if (currentState.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+                    {
+                        currentPokemon = Pokemon.Arcanine;
+                        StartBattle(Battle.Second);
+                        battle2Ready = false;
                     }
                 }
             }
             oldState = currentState;
             base.Update(gameTime);
         }
+
 
         protected override void Draw(GameTime gameTime)
         {
@@ -326,11 +354,14 @@ namespace Final_Assignment
             }
             if (screen == Screen.Battle)
             {
-                _spriteBatch.Draw(battleImg, battleLocation, Color.White);
+                if (battle == Battle.First)
+                    _spriteBatch.Draw(battle1Img, battleLocation, Color.White);
+                else if (battle == Battle.Second)
+                    _spriteBatch.Draw(battle2Img, battleLocation, Color.White);
                 if (currentEnemy == Enemy.Arcanine)
-                {
                     arcanine.Draw(_spriteBatch);
-                }
+                else if (currentEnemy == Enemy.Electivire)
+                    electivire.Draw(_spriteBatch);
                 if (currentPokemon == Pokemon.Snorlax)
                 {
                     snorlax.Draw(_spriteBatch);
@@ -376,6 +407,7 @@ namespace Final_Assignment
                     _spriteBatch.DrawString(healthFont, "/" + Convert.ToString(snorlax.Health), totalHealthText, Color.Black);
                     _spriteBatch.DrawString(healthFont, Convert.ToString(snorlax.HealthCurrent), healthAmountText, Color.Black);
 
+
                     if (snorlax.CurrentText == Snorlax.Text.bodyPress && snorlax.TextTime <= 3)
                     {
                         _spriteBatch.Draw(menu, menuTextbox, Color.White);
@@ -396,6 +428,76 @@ namespace Final_Assignment
                         _spriteBatch.Draw(menu, menuTextbox, Color.White);
                         _spriteBatch.DrawString(menuFont, "Snorlax used Defense Curl!", moveName1, Color.Black);
                         _spriteBatch.DrawString(menuFont, "Snorlax Defense Rose!", moveName2, Color.Black);
+                    }
+                }
+                else if (currentPokemon == Pokemon.Arcanine)
+                {
+                    arcanine.Draw(_spriteBatch);
+                    _spriteBatch.Draw(menu, menuLocation, Color.White);
+                    _spriteBatch.Draw(menu, moveInfoLocation, Color.White);
+                    _spriteBatch.Draw(arrow, arrowSize, Color.Black);
+                    _spriteBatch.DrawString(menuFont, arcanine.Move1, moveName1, Color.Black);
+                    _spriteBatch.DrawString(menuFont, arcanine.Move2, moveName2, Color.Black);
+                    _spriteBatch.DrawString(menuFont, arcanine.Move3, moveName3, Color.Black);
+                    _spriteBatch.DrawString(menuFont, arcanine.Move4, moveName4, Color.Black);
+                    _spriteBatch.DrawString(menuFont, "Type/", typeText, Color.Black);
+                    if (arrowSize.X == 20 && arrowSize.Y == 600)
+                    {
+                        _spriteBatch.DrawString(menuFont, "PP         /15", PPText, Color.Black);
+                        _spriteBatch.DrawString(menuFont, Convert.ToString(arcanine.Move1PP), movePP, Color.Black);
+                        _spriteBatch.DrawString(menuFont, "Fire", moveType, Color.Black);
+                    }
+                    if (arrowSize.X == 20 && arrowSize.Y == 680)
+                    {
+                        _spriteBatch.DrawString(menuFont, "PP         /15", PPText, Color.Black);
+                        _spriteBatch.DrawString(menuFont, Convert.ToString(arcanine.Move2PP), movePP, Color.Black);
+                        _spriteBatch.DrawString(menuFont, "Dark", moveType, Color.Black);
+                    }
+                    if (arrowSize.X == 290 && arrowSize.Y == 600)
+                    {
+                        _spriteBatch.DrawString(menuFont, "PP         /5", PPText, Color.Black);
+                        _spriteBatch.DrawString(menuFont, "Fire", moveType, Color.Black);
+                    }
+                    if (arrowSize.X == 290 && arrowSize.Y == 680)
+                    {
+                        _spriteBatch.DrawString(menuFont, "PP         /40", PPText, Color.Black);
+                        _spriteBatch.DrawString(menuFont, Convert.ToString(arcanine.Move4PP), movePP, Color.Black);
+                        _spriteBatch.DrawString(menuFont, "Normal", moveType, Color.Black);
+                    }
+                    _spriteBatch.Draw(arrow, arrowSize, Color.Black);
+                    _spriteBatch.Draw(nameIcon, charIconSize, Color.White);
+                    if (charHealthBar.Width >= 117)
+                        _spriteBatch.Draw(healthbar, charHealthBar, Color.LimeGreen);
+                    else if (charHealthBar.Width >= 47 && charHealthBar.Width <= 117)
+                        _spriteBatch.Draw(healthbar, charHealthBar, Color.YellowGreen);
+                    else
+                        _spriteBatch.Draw(healthbar, charHealthBar, Color.Red);
+                    _spriteBatch.Draw(healthIcon, charHealthImg, Color.White);
+                    _spriteBatch.DrawString(healthFont, Pokemon.Arcanine.ToString(), charNameText, Color.Black);
+                    _spriteBatch.DrawString(healthFont, "/" + Convert.ToString(arcanine.Health), totalHealthText, Color.Black);
+                    _spriteBatch.DrawString(healthFont, Convert.ToString(arcanine.HealthCurrent), healthAmountText, Color.Black);
+
+
+                    if (arcanine.CurrentText == Arcanine.Text.flamethrower && arcanine.TextTime <= 3)
+                    {
+                        _spriteBatch.Draw(menu, menuTextbox, Color.White);
+                        _spriteBatch.DrawString(menuFont, "Arcanine used Flamethrower!", moveName1, Color.Black);
+                    }
+                    if (arcanine.CurrentText == Arcanine.Text.crunch && arcanine.TextTime <= 3)
+                    {
+                        _spriteBatch.Draw(menu, menuTextbox, Color.White);
+                        _spriteBatch.DrawString(menuFont, "Arcanine used Crunch", moveName1, Color.Black);
+                    }
+                    if (arcanine.CurrentText == Arcanine.Text.fireblast && arcanine.TextTime <= 3)
+                    {
+                        _spriteBatch.Draw(menu, menuTextbox, Color.White);
+                        _spriteBatch.DrawString(menuFont, "Arcanine used Fire Blast!", moveName1, Color.Black);
+                    }
+                    if (arcanine.CurrentText == Arcanine.Text.howl && arcanine.TextTime <= 3)
+                    {
+                        _spriteBatch.Draw(menu, menuTextbox, Color.White);
+                        _spriteBatch.DrawString(menuFont, "Arcanine used Howl!", moveName1, Color.Black);
+                        _spriteBatch.DrawString(menuFont, "Arcanine Atttack Rose!", moveName2, Color.Black);
                     }
                 }
                 if (currentEnemy == Enemy.Arcanine)
@@ -456,6 +558,28 @@ namespace Final_Assignment
                 {
                     _spriteBatch.Draw(catching[ballFrame], ballLocation, Color.White);
                 }
+                if (!catchSelection && !inBall && shakeCount >= 3)
+                {
+                    if (catchSuccess <= 7)
+                    {
+                        _spriteBatch.Draw(catching[0], ballLocation, Color.White);
+                        _spriteBatch.Draw(catchingMenu, menuLocation, Color.White);
+                        _spriteBatch.Draw(catchingMenu2, moveInfoLocation, Color.White);
+                        _spriteBatch.Draw(catchStar, catchStarLocation, Color.White);
+                        _spriteBatch.DrawString(menuFont, "The pokemon has been", moveName1, Color.White);
+                        _spriteBatch.DrawString(menuFont, "successfully caught!", moveName2, Color.White);
+                        currentPokemon = Pokemon.Arcanine;
+                    }
+                    else
+                    {
+                        _spriteBatch.Draw(AWtexture, catchPokemon, Color.White);
+                        _spriteBatch.Draw(catchingMenu, menuLocation, Color.White);
+                        _spriteBatch.Draw(catchingMenu2, moveInfoLocation, Color.White);
+                        _spriteBatch.Draw(ballOpen, ballLocation, Color.White);
+                        _spriteBatch.DrawString(menuFont, "The pokemon escaped", moveName1, Color.White);
+                        _spriteBatch.DrawString(menuFont, "better luck next time.", moveName2, Color.White);
+                    }
+                }
             }
             _spriteBatch.End();
             base.Draw(gameTime);
@@ -504,64 +628,103 @@ namespace Final_Assignment
         {
             currentTurn = Turn.enemyTurn;
             snorlax.CanAct = false;
-            switch (snorlax.CurrentMove)
+            if (currentEnemy == Enemy.Arcanine && currentPokemon == Pokemon.Snorlax)
             {
-                case Snorlax.Move.headbutt:
-                    arcanine.HealthCurrent -= Snoremove1Damage;
-                    if (arcanine.HealthCurrent < 0)
-                        arcanine.HealthCurrent = 0;
-                    enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
-                    break;
-                case Snorlax.Move.bodyPress:
-                    arcanine.HealthCurrent -= Snoremove2Damage;
-                    if (arcanine.HealthCurrent < 0)
-                        arcanine.HealthCurrent = 0;
-                    enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
-                    break;
-                case Snorlax.Move.hyperBeam:
-                    arcanine.HealthCurrent -= Snoremove3Damage;
-                    if (arcanine.HealthCurrent < 0)
-                        arcanine.HealthCurrent = 0;
-                    enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
-                    break;
-                case Snorlax.Move.defenseCurl:
-                    break;
+                switch (snorlax.CurrentMove)
+                {
+                    case Snorlax.Move.headbutt:
+                        arcanine.HealthCurrent -= Snoremove1Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
+                        physical.Play();
+                        break;
+                    case Snorlax.Move.bodyPress:
+                        arcanine.HealthCurrent -= Snoremove2Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
+                        physical.Play();
+                        break;
+                    case Snorlax.Move.hyperBeam:
+                        arcanine.HealthCurrent -= Snoremove3Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
+                        break;
+                    case Snorlax.Move.defenseCurl:
+                        defenseSound.Play();
+                        break;
+                }
+            }
+            else if (currentEnemy == Enemy.Electivire && currentPokemon == Pokemon.Snorlax)
+            {
+                switch (snorlax.CurrentMove)
+                {
+                    case Snorlax.Move.headbutt:
+                        arcanine.HealthCurrent -= Snoremove1Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * electivire.HealthCurrent / electivire.Health);
+                        physical.Play();
+                        break;
+                    case Snorlax.Move.bodyPress:
+                        arcanine.HealthCurrent -= Snoremove2Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * electivire.HealthCurrent / electivire.Health);
+                        physical.Play();
+                        break;
+                    case Snorlax.Move.hyperBeam:
+                        arcanine.HealthCurrent -= Snoremove3Damage;
+                        if (arcanine.HealthCurrent < 0)
+                            arcanine.HealthCurrent = 0;
+                        enemyHealthBar.Width = (int)(235f * electivire.HealthCurrent / electivire.Health);
+                        break;
+                    case Snorlax.Move.defenseCurl:
+                        defenseSound.Play();
+                        break;
+                }
             }
             battleState = BattleState.animation;
         }
         void EnemyAction()
         {
-            currentTurn = Turn.charTurn;
-            enemyChoice = enemyMove.Next(1, 5);
-            arcanine.CanAct = false;
-            switch (enemyChoice)
+            if (currentEnemy == Enemy.Arcanine)
             {
-                case 1:
-                    arcanine.CurrentMove = Arcanine.Move.flamethrower;
-                    snorlax.HealthCurrent -= Arcmove1Damage;
-                    if (snorlax.HealthCurrent < 0)
-                        snorlax.HealthCurrent = 0;
-                    charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
-                    break;
-                case 2:
-                    arcanine.CurrentMove = Arcanine.Move.crunch;
-                    snorlax.HealthCurrent -= Arcmove2Damage;
-                    if (snorlax.HealthCurrent < 0)
-                        snorlax.HealthCurrent = 0;
-                    charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
-                    break;
-                case 3:
-                    arcanine.CurrentMove = Arcanine.Move.fireblast;
-                    snorlax.HealthCurrent -= Arcmove3Damage;
-                    if (snorlax.HealthCurrent < 0)
-                        snorlax.HealthCurrent = 0;
-                    charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
-                    break;
-                case 4:
-                    arcanine.CurrentMove = Arcanine.Move.howl;
-                    break;
+                currentTurn = Turn.charTurn;
+                enemyChoice = enemyMove.Next(1, 5);
+                arcanine.CanAct = false;
+                switch (enemyChoice)
+                {
+                    case 1:
+                        arcanine.CurrentMove = Arcanine.Move.flamethrower;
+                        snorlax.HealthCurrent -= Arcmove1Damage;
+                        if (snorlax.HealthCurrent < 0)
+                            snorlax.HealthCurrent = 0;
+                        charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
+                        flamethrower.Play();
+                        break;
+                    case 2:
+                        arcanine.CurrentMove = Arcanine.Move.crunch;
+                        snorlax.HealthCurrent -= Arcmove2Damage;
+                        if (snorlax.HealthCurrent < 0)
+                            snorlax.HealthCurrent = 0;
+                        charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
+                        break;
+                    case 3:
+                        arcanine.CurrentMove = Arcanine.Move.fireblast;
+                        snorlax.HealthCurrent -= Arcmove3Damage;
+                        if (snorlax.HealthCurrent < 0)
+                            snorlax.HealthCurrent = 0;
+                        charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
+                        break;
+                    case 4:
+                        arcanine.CurrentMove = Arcanine.Move.howl;
+                        break;
+                }
+                battleState = BattleState.animation;
             }
-            battleState = BattleState.animation;
         }
         void Animation(GameTime gameTime)
         {
@@ -577,13 +740,102 @@ namespace Final_Assignment
             snorlax.CanAct = true;
             arcanine.CanAct = true;
 
+
             snorlax.CurrentMove = Snorlax.Move.none;
             arcanine.CurrentMove = Arcanine.Move.none;
+
 
             if (currentTurn == Turn.enemyTurn)
                 battleState = BattleState.enemyAction;
             else
                 battleState = BattleState.playerInput;
         }
+        void StartBattle(Battle nextBattle)
+        {
+            battle = nextBattle;
+            MediaPlayer.Play(battleMusic);
+            catchPokemon.Width = 300;
+            catchPokemon.Height = 300;
+            enemyHealthBar.Width = 235;
+            charHealthBar.Width = 235;
+
+
+            arrowSize.X = 20;
+            arrowSize.Y = 600;
+
+
+            frameTime = 0;
+            shakeCount = 0;
+            catchSelection = false;
+            inBall = false;
+            switch (battle)
+            {
+                case Battle.First:
+                    currentEnemy = Enemy.Arcanine;
+                    break;
+                case Battle.Second:
+                    currentEnemy = Enemy.Electivire;
+                    break;
+                case Battle.Third:
+                    currentEnemy = Enemy.Sceptile;
+                    break;
+            }
+            enemyHealthBar.Width = 235;
+            screen = Screen.Battle;
+
+
+            SetMoveDamage();
+
+
+            if (charSpeed >= enemySpeed)
+            {
+                battleState = BattleState.playerInput;
+                currentTurn = Turn.charTurn;
+            }
+            else
+            {
+                battleState = BattleState.enemyAction;
+                currentTurn = Turn.enemyTurn;
+            }
+        }
+        void SetMoveDamage()
+        {
+            if (battle == Battle.First)
+            {
+                charSpeed = snorlax.Speed;
+                enemySpeed = arcanine.Speed;
+
+
+                Snoremove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 70 + 2) / 50);
+                Snoremove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 80 + 2) / 50);
+                Snoremove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)snorlax.Attack / arcanine.Defense) * 150 + 2) / 50);
+
+
+                Arcmove1Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.SAttack / snorlax.SDefense) * 70 + 2) / 50);
+                Arcmove2Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.Attack / snorlax.Defense) * 80 + 2) / 50);
+                Arcmove3Damage = (int)((((2 * 50 + 10) / 10) * ((float)arcanine.SAttack / snorlax.SDefense) * 150 + 2) / 50);
+            }
+        }
+        void MoveArrow()
+        {
+            if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
+                arrowSize.Y = 680;
+            else if (arrowSize.X == 20 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Right))
+                arrowSize.X = 290;
+            else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
+                arrowSize.Y = 600;
+            else if (arrowSize.X == 20 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Right))
+                arrowSize.X = 290;
+            else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Down))
+                arrowSize.Y = 680;
+            else if (arrowSize.X == 290 && arrowSize.Y == 600 && currentState.IsKeyDown(Keys.Left))
+                arrowSize.X = 20;
+            else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Up))
+                arrowSize.Y = 600;
+            else if (arrowSize.X == 290 && arrowSize.Y == 680 && currentState.IsKeyDown(Keys.Left))
+                arrowSize.X = 20;
+        }
     }
 }
+
+
