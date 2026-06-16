@@ -31,6 +31,12 @@
 /processorParam:Quality=Best
 /build:battleMusic.mp3
 
+#begin Bite.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Bite.mp3
+
 #begin blastBeam.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -127,6 +133,12 @@
 /processorParam:Quality=Best
 /build:defenseSound.mp3
 
+#begin FireBlast.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:FireBlast.mp3
+
 #begin flamethrower.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -188,6 +200,12 @@
 /processorParam:TextureFormat=Color
 /build:Howl.psd
 
+#begin howlSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:howlSound.mp3
+
 #begin hyperBeam.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -211,6 +229,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:hyperBeamImpact.psd
+
+#begin hyperSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:hyperSound.mp3
 
 #begin losingScreen.psd
 /importer:TextureImporter

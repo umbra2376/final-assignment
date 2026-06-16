@@ -7,6 +7,7 @@ using Pokemon;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 
 
 namespace Final_Assignment
@@ -17,7 +18,7 @@ namespace Final_Assignment
         private SpriteBatch _spriteBatch;
         KeyboardState currentState, oldState;
         SpriteFont menuFont, healthFont;
-        SoundEffect flamethrower, physical, defenseSound, pokeBallShaking;
+        SoundEffect flamethrower, physical, defenseSound, fireBlastSound, pokeBallShaking, biteSound, hyperSound, howlSound;
         SoundEffectInstance pokeBall;
         Song battleMusic, catchingMusic, titleMusic;
         Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, catchingArrow, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox, catchPokemon;
@@ -27,10 +28,10 @@ namespace Final_Assignment
         Electivire electivire;
         Texture2D snorlaxTexture, AOtexture, AWtexture, EWTexture, EOTexture, menu, healthbar, healthIcon, battle1Img, battle2Img, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture;
         Texture2D losingScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen, catchStar;
-        Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText, yesText, noText;
+        Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText, yesText, noText, tutortialText;
         int charSpeed, enemySpeed, enemyChoice, crit, catchSuccess, introFrame, ballFrame, shakeCount;
         int Snoremove1Damage, Snoremove2Damage, Snoremove3Damage, Arcmove1Damage, Arcmove2Damage, Arcmove3Damage;
-        bool catchSelection, inBall, battle2Ready;
+        bool catchSelection, inBall, battle2Ready, catchFinished;
         float frameTime, shakeTimer;
         Random enemyMove = new Random();
         Random catchRate = new Random();
@@ -102,6 +103,7 @@ namespace Final_Assignment
             yesText = new Vector2(780, 600);
             noText = new Vector2(790, 670);
             healthAmountText = new Vector2(777, 460);
+            tutortialText = new Vector2(130, 0);
             arrowSize = new Rectangle(20, 600, 50, 60);
             catchingArrow = new Rectangle(720, 600, 50, 60);
             charHealthImg = new Rectangle(570, 390, 370, 100);
@@ -117,6 +119,7 @@ namespace Final_Assignment
             catchSelection = false;
             inBall = false;
             battle2Ready = false;
+            catchFinished = false;
             screen = Screen.Intro;
             battle = Battle.First;
             arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(220, 383, 300, 300), new Rectangle(610, 90, 300, 300));
@@ -164,6 +167,10 @@ namespace Final_Assignment
             flamethrower = Content.Load<SoundEffect>("flamethrowerSound");
             physical = Content.Load<SoundEffect>("tackle");
             defenseSound = Content.Load<SoundEffect>("defenseSound");
+            fireBlastSound = Content.Load<SoundEffect>("FireBlast");
+            biteSound = Content.Load<SoundEffect>("Bite");
+            hyperSound = Content.Load<SoundEffect>("hyperSound");
+            howlSound = Content.Load<SoundEffect>("howlSound");
             pokeBallShaking = Content.Load<SoundEffect>("pokeballShaking");
             pokeBall = pokeBallShaking.CreateInstance();
             pokeBall.IsLooped = false;
@@ -186,13 +193,6 @@ namespace Final_Assignment
                 {
                     MediaPlayer.IsRepeating = true;
                     MediaPlayer.Play(titleMusic);
-                }
-            }
-            else
-            {
-                if (MediaPlayer.State == MediaState.Playing)
-                {
-                    MediaPlayer.Stop();
                 }
             }
             if (screen == Screen.Intro)
@@ -248,6 +248,8 @@ namespace Final_Assignment
                     if (frameTime >= 3.5)
                     {
                         screen = Screen.Catching;
+                        MediaPlayer.Stop();
+                        MediaPlayer.IsRepeating = true;
                         MediaPlayer.Play(catchingMusic);
 
                         frameTime = 0;
@@ -289,6 +291,7 @@ namespace Final_Assignment
                 }
                 if (inBall)
                 {
+                    pokeBall.IsLooped = false;
                     pokeBall.Play();
                     shakeTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (shakeCount < 3)
@@ -309,12 +312,13 @@ namespace Final_Assignment
                     }
                     else
                     {
+                        catchFinished = true;
                         ballFrame = 0;
                         if (catchSuccess <= 7)
                         {
                             inBall = false;
                             currentPokemon = Pokemon.Arcanine;
-                            arcanine.Wild = true;
+                            arcanine.Wild = false;
                             shakeCount = 0;
                             battle2Ready = true;
                         }
@@ -332,7 +336,7 @@ namespace Final_Assignment
                 {
                     if (currentState.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
                     {
-                        currentPokemon = Pokemon.Arcanine;
+                        catchFinished = false;
                         StartBattle(Battle.Second);
                         battle2Ready = false;
                     }
@@ -351,6 +355,7 @@ namespace Final_Assignment
             if (screen == Screen.Intro)
             {
                 _spriteBatch.Draw(intro[introFrame], window, Color.White);
+                _spriteBatch.DrawString(menuFont, "Press A to select and use arrow keys to move.", tutortialText, Color.Black);
             }
             if (screen == Screen.Battle)
             {
@@ -558,7 +563,8 @@ namespace Final_Assignment
                 {
                     _spriteBatch.Draw(catching[ballFrame], ballLocation, Color.White);
                 }
-                if (!catchSelection && !inBall && shakeCount >= 3)
+                if (!catchSelection && !inBall && catchFinished
+                    )
                 {
                     if (catchSuccess <= 7)
                     {
@@ -579,6 +585,10 @@ namespace Final_Assignment
                         _spriteBatch.DrawString(menuFont, "The pokemon escaped", moveName1, Color.White);
                         _spriteBatch.DrawString(menuFont, "better luck next time.", moveName2, Color.White);
                     }
+                }
+                if (battle2Ready)
+                {
+                    _spriteBatch.DrawString(menuFont, "Press enter to continue", tutortialText, Color.White);
                 }
             }
             _spriteBatch.End();
@@ -651,6 +661,7 @@ namespace Final_Assignment
                         if (arcanine.HealthCurrent < 0)
                             arcanine.HealthCurrent = 0;
                         enemyHealthBar.Width = (int)(235f * arcanine.HealthCurrent / arcanine.Health);
+                        hyperSound.Play();
                         break;
                     case Snorlax.Move.defenseCurl:
                         defenseSound.Play();
@@ -680,6 +691,7 @@ namespace Final_Assignment
                         if (arcanine.HealthCurrent < 0)
                             arcanine.HealthCurrent = 0;
                         enemyHealthBar.Width = (int)(235f * electivire.HealthCurrent / electivire.Health);
+                        hyperSound.Play();
                         break;
                     case Snorlax.Move.defenseCurl:
                         defenseSound.Play();
@@ -711,6 +723,7 @@ namespace Final_Assignment
                         if (snorlax.HealthCurrent < 0)
                             snorlax.HealthCurrent = 0;
                         charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
+                        biteSound.Play();
                         break;
                     case 3:
                         arcanine.CurrentMove = Arcanine.Move.fireblast;
@@ -718,9 +731,11 @@ namespace Final_Assignment
                         if (snorlax.HealthCurrent < 0)
                             snorlax.HealthCurrent = 0;
                         charHealthBar.Width = (int)(235f * snorlax.HealthCurrent / snorlax.Health);
+                        fireBlastSound.Play();
                         break;
                     case 4:
                         arcanine.CurrentMove = Arcanine.Move.howl;
+                        howlSound.Play();
                         break;
                 }
                 battleState = BattleState.animation;
@@ -753,11 +768,16 @@ namespace Final_Assignment
         void StartBattle(Battle nextBattle)
         {
             battle = nextBattle;
+            MediaPlayer.Stop();
+            MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(battleMusic);
             catchPokemon.Width = 300;
             catchPokemon.Height = 300;
             enemyHealthBar.Width = 235;
             charHealthBar.Width = 235;
+            snorlax.HealthCurrent = snorlax.Health;
+            arcanine.HealthCurrent = arcanine.Health;
+            electivire.HealthCurrent = electivire.Health;
 
 
             arrowSize.X = 20;
@@ -780,7 +800,6 @@ namespace Final_Assignment
                     currentEnemy = Enemy.Sceptile;
                     break;
             }
-            enemyHealthBar.Width = 235;
             screen = Screen.Battle;
 
 

@@ -165,7 +165,7 @@ namespace Pokemon
                     _blastLocation = new Rectangle(400, 180, 300, 200);
                 }
             }
-            if (_currentMove == Move.howl && _wild)
+            if (_currentMove == Move.howl)
             {
                 _canAct = false;
                 _currentText = Text.howl;
@@ -213,19 +213,11 @@ namespace Pokemon
             get { return _health; }
             set { _health = value; }
         }
-
-
-
-
         public int HealthCurrent
         {
             get { return _healtCurrent; }
             set { _healtCurrent = value; }
         }
-
-
-
-
         public int Speed
         {
             get { return _speed; }

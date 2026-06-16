@@ -189,7 +189,7 @@ namespace Pokemon
             if (_healthCurrent == 0)
             {
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
-                if (_battle_time >= 1)
+                if (_battle_time >= 1.5)
                     _location.Y += 10;
                 if (_battle_time >= 5)
                 {
