@@ -66,9 +66,15 @@ namespace Pokemon
                 _blastLocation = new Rectangle(400, 180, 300, 200);
                 _flameLocation = new Rectangle(400, 180, 300, 200);
                 _howlLocation = new Rectangle(470, 80, 150, 250);
+                _enemyHitbox = new Rectangle(120, 283, 200, 200);
+                _crunchLocation = new Rectangle(120, 283, 400, 300);
             }
-            _enemyHitbox = new Rectangle(120, 283, 200, 200);
-            _crunchLocation = new Rectangle(120, 283, 400, 300);
+            else
+            {
+                _blastLocation = new Rectangle(350, 600, 300, 200);
+                _flameLocation = new Rectangle(350, 600, 300, 200);
+                _howlLocation = new Rectangle(340, 500, 150, 250);
+            }
             Random stats = new Random();
             _speed = stats.Next(80, 111);
             _health = stats.Next(80, 101);
@@ -117,6 +123,37 @@ namespace Pokemon
                     _flameLocation.Y = 180;
                 }
             }
+            if (_currentMove == Move.flamethrower && !_wild)
+            {
+                _canAct = false;
+                _currentText = Text.flamethrower;
+                _textTime += (float)gametime.ElapsedGameTime.TotalSeconds;
+                _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
+                if (_battle_time <= 1)
+                {
+                    _flameLocation.Width -= 5;
+                    _flameLocation.Height -= 2;
+                    _flameLocation.X += 5;
+                }
+                else if (_battle_time <= 2)
+                {
+                    _flameLocation.Width += 6;
+                    _flameLocation.X += 5;
+                    _flameLocation.Y -= 8;
+                }
+                if (_battle_time >= 2)
+                {
+                    _currentText = Text.none;
+                    _currentMove = Move.none;
+                    _canAct = true;
+                    _textTime = 0;
+                    _battle_time = 0;
+                    _flameLocation.Width = 300;
+                    _flameLocation.Height = 200;
+                    _flameLocation.X = 350;
+                    _flameLocation.Y = 0;
+                }
+            }
             if (_currentMove == Move.crunch && _wild)
             {
                 _canAct = false;
@@ -151,6 +188,39 @@ namespace Pokemon
                     _blastHit = true;
                     _blastLocation.Width -= 5;
                     _blastLocation.Y += 5;
+                    _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
+                }
+                if (_battle_time >= 3 && _textTime >= 3)
+                {
+                    _currentMove = Move.none;
+                    _currentText = Text.none;
+                    _canAct = true;
+                    _blastHit = false;
+                    _textTime = 0;
+                    _battle_time = 0;
+                    _frame_time = 0;
+                    _blastLocation = new Rectangle(400, 180, 300, 200);
+                }
+            }
+            if (_currentMove == Move.fireblast && !_wild)
+            {
+                _canAct = false;
+                _currentText = Text.fireblast;
+                _textTime += (float)gametime.ElapsedGameTime.TotalSeconds;
+                _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
+                _frame_time += (float)gametime.ElapsedGameTime.TotalSeconds;
+                if (!_blastHit && _frame_time >= _blastInterval)
+                {
+                    _blastLocation.Width -= 5;
+                    _blastLocation.Height -= 1;
+                    _blastLocation.X += 5;
+                    _frame_time = 0;
+                }
+                if (_blastLocation.Intersects(_enemyHitbox))
+                {
+                    _blastHit = true;
+                    _blastLocation.Width += 5;
+                    _blastLocation.Y -= 5;
                     _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
                 }
                 if (_battle_time >= 3 && _textTime >= 3)

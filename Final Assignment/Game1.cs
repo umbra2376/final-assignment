@@ -122,7 +122,7 @@ namespace Final_Assignment
             catchFinished = false;
             screen = Screen.Intro;
             battle = Battle.First;
-            arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(220, 383, 300, 300), new Rectangle(610, 90, 300, 300));
+            arcanine = new Arcanine(AWtexture, AOtexture, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture, new Rectangle(190, 340, 300, 300), new Rectangle(610, 90, 300, 300));
             snorlax = new Snorlax(snorlaxTexture, hyperBeam, hyperBeamImpact, defenseCurl, new Rectangle(120, 283, 400, 400));
             electivire = new Electivire(EWTexture, EOTexture, new Rectangle(220, 383, 300, 300), new Rectangle(610, 90, 300, 300));
             currentPokemon = Pokemon.Snorlax;
