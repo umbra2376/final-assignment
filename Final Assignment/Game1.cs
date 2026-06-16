@@ -20,14 +20,14 @@ namespace Final_Assignment
         SpriteFont menuFont, healthFont;
         SoundEffect flamethrower, physical, defenseSound, fireBlastSound, pokeBallShaking, biteSound, hyperSound, howlSound;
         SoundEffectInstance pokeBall;
-        Song battleMusic, catchingMusic, titleMusic;
+        Song battleMusic, catchingMusic, titleMusic, pokeTheme;
         Rectangle window, menuLocation, moveInfoLocation, battleLocation, arrowSize, catchingArrow, charHealthBar, enemyHealthBar, charHealthImg, enemyHealthImg, charIconSize, enemyIconSize, menuTextbox, catchPokemon;
         Rectangle ballLocation, catchStarLocation;
         Snorlax snorlax;
         Arcanine arcanine;
         Electivire electivire;
         Texture2D snorlaxTexture, AOtexture, AWtexture, EWTexture, EOTexture, menu, healthbar, healthIcon, battle1Img, battle2Img, arrow, nameIcon, hyperBeam, hyperBeamImpact, defenseCurl, blastTexture, blastImpact, crunchTexture, flamethrowerTexture, howlTexture;
-        Texture2D losingScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen, catchStar;
+        Texture2D losingScreen, winningScreen, catchingBackground, catchingMenu, catchingMenu2, ballOpen, catchStar;
         Vector2 moveType, moveName1, moveName2, moveName3, moveName4, typeText, PPText, movePP, charNameText, enemyNameText, totalHealthText, healthAmountText, yesText, noText, tutortialText;
         int charSpeed, enemySpeed, enemyChoice, crit, catchSuccess, introFrame, ballFrame, shakeCount;
         int Snoremove1Damage, Snoremove2Damage, Snoremove3Damage, Arcmove1Damage, Arcmove2Damage, Arcmove3Damage;
@@ -134,6 +134,7 @@ namespace Final_Assignment
             intro.Add(Content.Load<Texture2D>("pokeIntroFinal(1)"));
             intro.Add(Content.Load<Texture2D>("pokeIntroFinal(2)"));
             losingScreen = Content.Load<Texture2D>("losingScreen");
+            winningScreen = Content.Load<Texture2D>("winningScreen");
             catchingBackground = Content.Load<Texture2D>("catchBackground");
             catchingMenu = Content.Load<Texture2D>("catchingMenu");
             catchingMenu2 = Content.Load<Texture2D>("catchingMenu2");
@@ -178,6 +179,7 @@ namespace Final_Assignment
             battleMusic = Content.Load<Song>("battleMusic");
             catchingMusic = Content.Load<Song>("catchingMusic");
             titleMusic = Content.Load<Song>("titleTheme");
+            pokeTheme = Content.Load<Song>("pokeTheme");
             MediaPlayer.Volume = 0.3f;
             // TODO: use this.Content to load your game content here
         }
@@ -247,13 +249,24 @@ namespace Final_Assignment
                     frameTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (frameTime >= 3.5)
                     {
-                        screen = Screen.Catching;
+                        screen = Screen.End;
                         MediaPlayer.Stop();
                         MediaPlayer.IsRepeating = true;
-                        MediaPlayer.Play(catchingMusic);
+                        MediaPlayer.Play(pokeTheme);
 
                         frameTime = 0;
                     }
+                }
+            }
+            if (screen == Screen.End)
+            {
+                frameTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (frameTime >= 10)
+                {
+                    screen = Screen.Catching;
+                    MediaPlayer.Stop();
+                    MediaPlayer.IsRepeating = true;
+                    MediaPlayer.Play(catchingMusic);
                 }
             }
             if (screen == Screen.Catching)
@@ -542,6 +555,10 @@ namespace Final_Assignment
             if (screen == Screen.Lose)
             {
                 _spriteBatch.Draw(losingScreen, window, Color.White);
+            }
+            if (screen == Screen.End)
+            {
+                _spriteBatch.Draw(winningScreen, window, Color.White);
             }
             if (screen == Screen.Catching)
             {

@@ -360,6 +360,12 @@
 #begin pokemonFont.ttf
 /copy:pokemonFont.ttf
 
+#begin pokeTheme.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:pokeTheme.mp3
+
 #begin sandBattlefield.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -455,4 +461,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:WElectivire.psd
+
+#begin winningScreen.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:winningScreen.psd
 
