@@ -15,6 +15,10 @@ using System.Threading.Tasks;
 
 
 
+
+
+
+
 namespace Pokemon
 {
     class Arcanine
@@ -61,20 +65,6 @@ namespace Pokemon
             _move3_PP = 5;
             _move4_PP = 40;
             _blastInterval = 0.05f;
-            if (_wild)
-            {
-                _blastLocation = new Rectangle(400, 180, 300, 200);
-                _flameLocation = new Rectangle(400, 180, 300, 200);
-                _howlLocation = new Rectangle(470, 80, 150, 250);
-                _enemyHitbox = new Rectangle(120, 283, 200, 200);
-                _crunchLocation = new Rectangle(120, 283, 400, 300);
-            }
-            else
-            {
-                _blastLocation = new Rectangle(350, 600, 300, 200);
-                _flameLocation = new Rectangle(350, 600, 300, 200);
-                _howlLocation = new Rectangle(340, 500, 150, 250);
-            }
             Random stats = new Random();
             _speed = stats.Next(80, 111);
             _health = stats.Next(80, 101);
@@ -86,9 +76,6 @@ namespace Pokemon
             _howlEffect = (float)(_attack * 0.67);
             _currentMove = Move.none;
         }
-
-
-
 
         public void Update(GameTime gametime)
         {
@@ -117,10 +104,7 @@ namespace Pokemon
                     _canAct = true;
                     _textTime = 0;
                     _battle_time = 0;
-                    _flameLocation.Width = 300;
-                    _flameLocation.Height = 200;
-                    _flameLocation.X = 400;
-                    _flameLocation.Y = 180;
+                    _flameLocation = new Rectangle(400, 180, 300, 200);
                 }
             }
             if (_currentMove == Move.flamethrower && !_wild)
@@ -131,15 +115,14 @@ namespace Pokemon
                 _battle_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 if (_battle_time <= 1)
                 {
-                    _flameLocation.Width -= 5;
-                    _flameLocation.Height -= 2;
-                    _flameLocation.X += 5;
+                    _flameLocation.Width += 3;
+                    _flameLocation.Y -= 2;
                 }
-                else if (_battle_time <= 2)
+                else if (_battle_time <= 1.5)
                 {
-                    _flameLocation.Width += 6;
-                    _flameLocation.X += 5;
-                    _flameLocation.Y -= 8;
+                    _flameLocation.Width -= 10;
+                    _flameLocation.X += 10;
+                    _flameLocation.Y -= 2;
                 }
                 if (_battle_time >= 2)
                 {
@@ -148,13 +131,10 @@ namespace Pokemon
                     _canAct = true;
                     _textTime = 0;
                     _battle_time = 0;
-                    _flameLocation.Width = 300;
-                    _flameLocation.Height = 200;
-                    _flameLocation.X = 350;
-                    _flameLocation.Y = 0;
+                    _flameLocation = new Rectangle(350, 340, 300, 200);
                 }
             }
-            if (_currentMove == Move.crunch && _wild)
+            if (_currentMove == Move.crunch)
             {
                 _canAct = false;
                 _currentText = Text.crunch;
@@ -188,7 +168,7 @@ namespace Pokemon
                     _blastHit = true;
                     _blastLocation.Width -= 5;
                     _blastLocation.Y += 5;
-                    _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
+                    _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 300, 300);
                 }
                 if (_battle_time >= 3 && _textTime >= 3)
                 {
@@ -211,17 +191,17 @@ namespace Pokemon
                 _frame_time += (float)gametime.ElapsedGameTime.TotalSeconds;
                 if (!_blastHit && _frame_time >= _blastInterval)
                 {
-                    _blastLocation.Width -= 5;
-                    _blastLocation.Height -= 1;
-                    _blastLocation.X += 5;
+                    _blastLocation.Width += 1;
+                    _blastLocation.X += 1;
+                    _blastLocation.Y -= 1;
                     _frame_time = 0;
                 }
                 if (_blastLocation.Intersects(_enemyHitbox))
                 {
                     _blastHit = true;
-                    _blastLocation.Width += 5;
-                    _blastLocation.Y -= 5;
-                    _impactLocation = new Rectangle(_enemyHitbox.X, _enemyHitbox.Y, 400, 400);
+                    _blastLocation.Width -= 10;
+                    _blastLocation.Y -= 3;
+                    _impactLocation = new Rectangle(610, 90, 400, 400);
                 }
                 if (_battle_time >= 3 && _textTime >= 3)
                 {
@@ -232,7 +212,7 @@ namespace Pokemon
                     _textTime = 0;
                     _battle_time = 0;
                     _frame_time = 0;
-                    _blastLocation = new Rectangle(400, 180, 300, 200);
+                    _blastLocation = new Rectangle(350, 340, 300, 200);
                 }
             }
             if (_currentMove == Move.howl)
@@ -365,8 +345,11 @@ namespace Pokemon
         public void Draw(SpriteBatch spriteBatch)
         {
             if (_wild)
-            {
                 spriteBatch.Draw(_Wtexture, _Wlocation, Color.White);
+            else
+                spriteBatch.Draw(_Otexture, _Olocation, Color.White);
+            if (_wild)
+            {
                 if (_currentMove == Move.flamethrower)
                 {
                     spriteBatch.Draw(_flamethrower, _flameLocation, Color.White);
@@ -404,9 +387,79 @@ namespace Pokemon
                     spriteBatch.Draw(_howl, _howlLocation, null, Color.White * _alpha, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0f);
                 }
             }
+        }
+        public void OwnedLocations()
+        {
+            _blastLocation = new Rectangle(350, 340, 300, 200);
+            _flameLocation = new Rectangle(350, 340, 300, 200);
+            _howlLocation = new Rectangle(425, 425, 150, 250);
+            _crunchLocation = new Rectangle(510, 90, 400, 300);
+            _enemyHitbox = new Rectangle(610, 90, 300, 200);
+            _Olocation = new Rectangle(190, 340, 300, 300);
+        }
+        public void WildLocations()
+        {
+            _blastLocation = new Rectangle(400, 180, 300, 200);
+            _flameLocation = new Rectangle(400, 180, 300, 200);
+            _howlLocation = new Rectangle(470, 80, 150, 250);
+            _enemyHitbox = new Rectangle(120, 283, 200, 200);
+            _crunchLocation = new Rectangle(120, 283, 400, 300);
+            _Wlocation = new Rectangle(610, 90, 300, 300);
+        }
+        public void ResetAnimation()
+        {
+            _battle_time = 0;
+            _frame_time = 0;
+            _textTime = 0;
+            _blastHit = false;
+            _alpha = 0;
+        }
+        public void DrawPokemon(SpriteBatch spriteBatch)
+        {
+            if (_wild)
+                spriteBatch.Draw(_Wtexture, _Wlocation, Color.White);
             else
-            {
                 spriteBatch.Draw(_Otexture, _Olocation, Color.White);
+        }
+        public void DrawAttack(SpriteBatch spriteBatch)
+        {
+            {
+                if (_currentMove == Move.flamethrower)
+                {
+                    spriteBatch.Draw(_flamethrower, _flameLocation, Color.White);
+                }
+                if (_currentMove == Move.crunch)
+                {
+                    _alpha = 0f;
+                    if (_battle_time <= 0.5f)
+                        _alpha = _battle_time / 0.5f;
+                    else if (_battle_time <= 1.5f)
+                        _alpha = 1;
+                    else if (_battle_time <= 2f)
+                        _alpha = 1f - ((_battle_time - 1.5f) / 0.5f);
+                    else
+                        _alpha = 0;
+                    spriteBatch.Draw(_crunch, _crunchLocation, Color.White * _alpha);
+                }
+                if (_currentMove == Move.fireblast)
+                {
+                    spriteBatch.Draw(_blastTexture, _blastLocation, Color.White);
+                    if (_blastHit && _battle_time <= 3)
+                        spriteBatch.Draw(_blastImpact, _impactLocation, Color.White);
+                }
+                if (_currentMove == Move.howl)
+                {
+                    _alpha = 0f;
+                    if (_battle_time <= 0.5f)
+                        _alpha = _battle_time / 0.5f;
+                    else if (_battle_time <= 1.5f)
+                        _alpha = 1;
+                    else if (_battle_time <= 2f)
+                        _alpha = 1f - ((_battle_time - 1.5f) / 0.5f);
+                    else
+                        _alpha = 0;
+                    spriteBatch.Draw(_howl, _howlLocation, Color.White * _alpha);
+                }
             }
         }
     }

@@ -61,6 +61,24 @@
 /processorParam:TextureFormat=Color
 /build:blastImpact.psd
 
+#begin bulkUp.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bulkUp.psd
+
+#begin BulkUpSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:BulkUpSound.mp3
+
 #begin catchBackground.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -236,6 +254,18 @@
 /processorParam:Quality=Best
 /build:hyperSound.mp3
 
+#begin icePunch.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icePunch.psd
+
 #begin losingScreen.psd
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -271,6 +301,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ownedArcanine.psd
+
+#begin PiceSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:PiceSound.mp3
 
 #begin pokeBall1.psd
 /importer:TextureImporter
@@ -357,6 +393,12 @@
 /processorParam:TextureFormat=Color
 /build:pokeIntroFinal(2).psd
 
+#begin pokeLoseMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:pokeLoseMusic.mp3
+
 #begin pokemonFont.ttf
 /copy:pokemonFont.ttf
 
@@ -365,6 +407,12 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:pokeTheme.mp3
+
+#begin PthunderSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:PthunderSound.mp3
 
 #begin sandBattlefield.psd
 /importer:TextureImporter
@@ -432,6 +480,18 @@
 /processorParam:Quality=Best
 /build:tackle.mp3
 
+#begin thunderPunch.psd
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:thunderPunch.psd
+
 #begin tile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -449,6 +509,12 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:titleTheme.mp3
+
+#begin WChargeSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:WChargeSound.mp3
 
 #begin WElectivire.psd
 /importer:TextureImporter
